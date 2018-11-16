@@ -8,7 +8,7 @@ dynamic/www
 dynamic/views
 dynamic/dist
 # config
-config/*
+config/*ls
 !config/default.js
 
 # dist
