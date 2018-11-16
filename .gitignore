@@ -1,0 +1,18 @@
+# jetbrains
+.idea/
+*.iml
+
+# nodejs
+dynamic/node_modules
+dynamic/www
+dynamic/views
+dynamic/dist
+# config
+config/*
+!config/default.js
+
+# dist
+dist/
+
+# test
+test.js
