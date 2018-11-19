@@ -3,18 +3,22 @@
 
 
 const cheerio = require('cheerio');
+const config = require('../config');
 const request = require('request');
 const Movie = require('../models/movie');
 const moment = require('moment');
 const fs = require('fs');
+const path = require('path');
 const data = require('../data/index');
 const TV = require('../models/tv');
 const Comment = require('../models/comment');
-
+const getHtmlText = require('../utils/utils').getHtmlText;
 
 /**
  * 添加电影的细节信息描述（未插入数据到数据库）
  * 从爱奇艺上抓取排行榜靠前的电影数据，包括图片，描述，评分
+ * 
+ * 
  * @param req
  * @param res
  * @param next
@@ -71,6 +75,7 @@ exports.addMovie = function (req, res, next) {
         // console.log('数据去重成功……………………, 有效记录', movieList.length - movieList.length, '条', '去重记录', movieList.length + '条')
         // 3. 开始把去重之后的数据插入到数据库
         let successNum = 0;
+        let len = 0;
         movieList.forEach(function (item) {
             // 获取数据信息
             let url = item.url;
@@ -105,14 +110,14 @@ exports.addMovie = function (req, res, next) {
                 if (err) {
                     return next(err);
                 }
-
-                result
+                //执行一次sql
+                len++;
                 // 这个是最终去重之后的数据记录
-                if (result.affectedRows > 0) {
-                    return res.json({
-                        code: 1,
-                        msg: '数据入库成功，去除重复记录共计' + (movieList.length - successNum) + '条'
-                    });
+                if (len === movieList.length) {
+                    res.json({
+                        code: 0,
+                        msg: len
+                    })
                 }
             });
 
@@ -182,7 +187,7 @@ function getMovieDetails(req, url, callback) {
                         height: height,
                         logo: imgSrc,
                         info: $(site_piclist_info_describe[index]).text(),
-                        score: $(score[index]).html().trim(),
+                        score: getHtmlText($(score[index]).html().trim()),
                     });
 
                 }
@@ -190,6 +195,8 @@ function getMovieDetails(req, url, callback) {
         }
 
         // 在这里判断
+        movieList.length = 5;
+        len = 5;
         if (movieList.length === len) {
             saveImages(movieList, function (err, movieList) {
                 if (err) {
@@ -198,6 +205,7 @@ function getMovieDetails(req, url, callback) {
 
                 // console.log('本轮抓取到数据共计' + len + '条---------------------------------------------')
                 // 把当前数据挂载起来
+
                 req.app.locals.config.movielist = movieList;
 
 
@@ -249,8 +257,8 @@ exports.doSearchMovie = function (req, res, next) {
 
         // 开始获取用户评论的数据信息
         let params = {
-            start : 0,
-            pageSize : 5
+            start: 0,
+            pageSize: 5
         }
         // 获取评论的详细信息
         Comment.getCommentByCurrentPage(params, function (err, comments) {
@@ -266,9 +274,9 @@ exports.doSearchMovie = function (req, res, next) {
                 let pageNum = pageInfo.pageNums;
                 // 就直接解析当前地址， 然后播放视频
                 return res.render('play', {
-                    playUrl : searchMoviename,
-                    comments : comments,
-                    pageNum : Math.ceil(pageNum / 5),
+                    playUrl: searchMoviename,
+                    comments: comments,
+                    pageNum: Math.ceil(pageNum / 5),
                 });
             })
         })
@@ -293,7 +301,7 @@ exports.doSearchMovie = function (req, res, next) {
                     let url = element.url;
                     element.url = url.substring(url.lastIndexOf('/') + 1)
                     element.addtime = moment(element.addtime).format('YYYY-MM-DD');
-                    if(element.info.toString().length > 20) {
+                    if (element.info.toString().length > 20) {
                         element.info = element.info.toString().substring(0, 30);
                     }
                 })
@@ -306,7 +314,7 @@ exports.doSearchMovie = function (req, res, next) {
                 let url = element.url;
                 element.url = url.substring(url.lastIndexOf('/') + 1)
                 element.addtime = moment().format('YYYY-MM-DD');
-                if(element.info.toString().length > 20) {
+                if (element.info.toString().length > 20) {
                     element.info = element.info.toString().substring(0, 30);
                 }
             })
@@ -335,9 +343,11 @@ function saveImages(movieList, callback) {
                 if (tempArr.length === 2) {
                     url = tempArr[0];
                 }
-                let newPath = './www/uploads/movie/' + (+new Date()) + url + '.jpg';
+                let newPath = '../www/uploads/movie/' + (+new Date()) + url + '.jpg';
+
                 // 开始下载图片数据信息
-                request(item.logo).pipe(fs.createWriteStream(newPath));
+                request(item.logo).pipe(fs.createWriteStream(path.join(__dirname, newPath)));
+                item.logo = config.http + newPath.substr(2);
                 nums--;
                 if (nums === 0) {
                     callback(null, movieList);
@@ -406,8 +416,8 @@ exports.doSearchMovieOnline = function (req, res, next) {
 
         // 开始获取用户评论的数据信息
         let params = {
-            start : 0,
-            pageSize : 5
+            start: 0,
+            pageSize: 5
         }
         // 获取评论的详细信息
         Comment.getCommentByCurrentPage(params, function (err, comments) {
@@ -423,9 +433,9 @@ exports.doSearchMovieOnline = function (req, res, next) {
                 let pageNum = pageInfo.pageNums;
                 // 就直接解析当前地址， 然后播放视频
                 return res.render('play', {
-                    playUrl : searchMoviename,
-                    comments : comments,
-                    pageNum : Math.ceil(pageNum / 5),
+                    playUrl: searchMoviename,
+                    comments: comments,
+                    pageNum: Math.ceil(pageNum / 5),
                 });
             })
         })
@@ -450,7 +460,7 @@ exports.doSearchMovieOnline = function (req, res, next) {
                     let url = element.url;
                     element.url = url.substring(url.lastIndexOf('/') + 1)
                     element.addtime = moment(element.addtime).format('YYYY-MM-DD');
-                    if(element.info.toString().length > 20) {
+                    if (element.info.toString().length > 20) {
                         element.info = element.info.toString().substring(0, 30);
                     }
                 })
@@ -463,7 +473,7 @@ exports.doSearchMovieOnline = function (req, res, next) {
                 let url = element.url;
                 element.url = url.substring(url.lastIndexOf('/') + 1)
                 element.addtime = moment().format('YYYY-MM-DD')
-                if(element.info.toString().length > 20) {
+                if (element.info.toString().length > 20) {
                     element.info = element.info.toString().substring(0, 30);
                 }
             })

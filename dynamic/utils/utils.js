@@ -11,10 +11,10 @@ var http = require('http');
 exports.getIPInfo = function (ip, callback) {
     var taobao_server = 'http://ip.taobao.com/service/getIpInfo.php?ip=';
     var url = taobao_server + ip;
-    http.get(url, function(res) {
+    http.get(url, function (res) {
         var code = res.statusCode;
         if (code == 200) {
-            res.on('data', function(data) {
+            res.on('data', function (data) {
                 try {
                     callback(null, JSON.parse(data));
                 } catch (err) {
@@ -24,6 +24,9 @@ exports.getIPInfo = function (ip, callback) {
         } else {
             callback({ code: code });
         }
-    }).on('error', function(e) { callback(e, null); });
+    }).on('error', function (e) { callback(e, null); });
 }
-
+exports.getHtmlText = (html) => {
+    html = html.replace(/<\/?.+?>/g, "");
+    return html.replace(/ /g, "");//dds为得到后的内容
+}

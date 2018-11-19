@@ -40,8 +40,10 @@ router.get('/search', movieController.showSearchMovie);
 router.get('/search/:content', movieController.doSearchMovieOnline);
 router.post('/search', movieController.doSearchMovie);
 router.get('/addTV', movieController.doGetTVs);
-
-
+//从网上抓取数据并返回
+router.get('/showMovieAddDetails',movieController.showMovieAddDetails);
+//将抓取的数据插入到数据库
+router.post('/addMovie',movieController.addMovie);
 // 404 page
 router.use(function (req, res, next) {
     return res.render('404');
