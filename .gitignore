@@ -3,6 +3,7 @@
 *.iml
 
 # nodejs
+node_modules
 dynamic/node_modules
 dynamic/www
 dynamic/views
