@@ -3,7 +3,7 @@
 const path = require('path');
 
 module.exports = {
-    http: 'localhost:3000',
+    http: 'localhost:8080',
     isDebug: true,                                                         // 是否为调试模式
     secretKey: 'video-2018',                                               // 验证码session
     pageSize: 5,                                                           // 每页显示内容数量

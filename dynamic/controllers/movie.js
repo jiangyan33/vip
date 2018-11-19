@@ -3,7 +3,6 @@
 
 
 const cheerio = require('cheerio');
-const config = require('../config');
 const request = require('request');
 const Movie = require('../models/movie');
 const moment = require('moment');
@@ -12,7 +11,7 @@ const path = require('path');
 const data = require('../data/index');
 const TV = require('../models/tv');
 const Comment = require('../models/comment');
-const getHtmlText = require('../utils/utils').getHtmlText;
+
 
 /**
  * 添加电影的细节信息描述（未插入数据到数据库）
@@ -187,7 +186,7 @@ function getMovieDetails(req, url, callback) {
                         height: height,
                         logo: imgSrc,
                         info: $(site_piclist_info_describe[index]).text(),
-                        score: getHtmlText($(score[index]).html().trim()),
+                        score: $(score[index]).html().trim()
                     });
 
                 }
@@ -195,8 +194,8 @@ function getMovieDetails(req, url, callback) {
         }
 
         // 在这里判断
-        movieList.length = 5;
-        len = 5;
+        movieList.length = 50;
+        len = 50;
         if (movieList.length === len) {
             saveImages(movieList, function (err, movieList) {
                 if (err) {
@@ -347,7 +346,7 @@ function saveImages(movieList, callback) {
 
                 // 开始下载图片数据信息
                 request(item.logo).pipe(fs.createWriteStream(path.join(__dirname, newPath)));
-                item.logo = config.http + newPath.substr(2);
+                item.logo = newPath.substr(2);
                 nums--;
                 if (nums === 0) {
                     callback(null, movieList);
