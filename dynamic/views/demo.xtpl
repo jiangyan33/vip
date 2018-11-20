@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script>
+    </script>
+</head>
+<body>
+ 
+
+ Hello {{success}}
+You have just won ${{number}}!
+
+
+<br>
+
+{{#each (students)}}
+{{#if (!xindex)}}
+
+{{success}}
+
+{{else}}
+this is a book
+{{/if}}
+    {{this.name}}<br>
+    {{xindex}}<br>
+    {{xcount}}<br>
+{{/each}}
+</body>
+</html>

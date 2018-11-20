@@ -41,9 +41,25 @@ router.get('/search/:content', movieController.doSearchMovieOnline);
 router.post('/search', movieController.doSearchMovie);
 router.get('/addTV', movieController.doGetTVs);
 //从网上抓取数据并返回
-router.get('/showMovieAddDetails',movieController.showMovieAddDetails);
+router.get('/showMovieAddDetails', movieController.showMovieAddDetails);
 //将抓取的数据插入到数据库
-router.post('/addMovie',movieController.addMovie);
+router.post('/addMovie', movieController.addMovie);
+//测试xtpl使用数据
+router.get('/test', function (req, res) {
+    let message = {
+        students: [
+            { name: '小明', age: 10 },
+            { name: '小红', age: 11 }, { name: '小均', age: 20 }, { name: '小丽', age: 30 }
+        ],
+        user: {
+            username: '石江山',
+            password: 123
+        },
+        success: true,
+        number: 1000
+    };
+    return res.render('demo', message);
+})
 // 404 page
 router.use(function (req, res, next) {
     return res.render('404');

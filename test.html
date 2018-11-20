@@ -2,16 +2,18 @@
 <link rel="stylesheet" href="/www/css/index-6ffb15d628.css">{{/block}} {{#block ("body")}}<div class="main">
     <div class="w">
         <div class="main-slider">
-            <div class="main-item"><a class="first" href="#"></a> <a class="current" href="/play/{{previews[0].playurl}}"><span
-                        class="current-title">{{previews[0].title}}</span><span class="current-content">{{previews[0].content}}</span>
-                </a><a href="/play/{{previews[1].playurl}}"><span>{{previews[1].title}}</span><span>{{previews[1].content}}</span>
-                </a><a href="/play/{{previews[2].playurl}}"><span>{{previews[2].title}}</span><span>{{previews[2].content}}</span>
-                </a><a href="/play/{{previews[3].playurl}}"><span>{{previews[3].title}}</span><span>{{previews[3].content}}</span>
-                </a><a href="/play/{{previews[4].playurl}}"><span>{{previews[4].title}}</span><span>{{previews[4].content}}</span>
-                </a><a href="/play/{{previews[5].playurl}}"><span>{{previews[5].title}}</span><span>{{previews[5].content}}</span>
-                </a><a href="/play/{{previews[6].playurl}}"><span>{{previews[6].title}}</span><span>{{previews[6].content}}</span>
-                </a><a href="/play/{{previews[7].playurl}}"><span>{{previews[7].title}}</span><span>{{previews[7].content}}</span>
-                </a><a class="last" href="#"></a></div><a href="javascript:void(0);" class="arrow-l">&lt;</a> <a href="javascript:void(0);"
+            <div class="main-item"><a class="first" href="#"></a>
+
+                <!-- 尝试使用循环 -->
+                {{#each (previews)}}
+                {{#if (!xindex)}}
+                <a class="current" href="/play/{{playurl}}"><span class="current-title">{{title}}</span><span class="current-content">{{content}}</span>
+                </a>
+                {{else}}
+                <a href="/play/{{playurl}}"><span>{{title}}</span><span>{{content}}</span></a>
+                {{/if}}
+                {{/each}}
+                <a class="last" href="#"></a></div><a href="javascript:void(0);" class="arrow-l">&lt;</a> <a href="javascript:void(0);"
                 class="arrow-r">&gt;</a>
         </div>
     </div>
@@ -30,16 +32,16 @@
             <ul class="movies-ul" id="movie-content">{{#if (movies)}} {{#each (movies)}}<li><a class="movies-img" href="/play/{{this.url}}"><img
                             src="{{this.logo}}" alt=""></a>
                     <div class="movie-top"><span class="movie-num">影院正在热映</span> <span class="movie-vip">VIP</span>
-                        <span class="movie-score"><strong class="score-strong">8</strong>.7</span></div>
-                    <div class="movies-info"><span class="movie-name">{{this.title}}</span> <span class="movie-desc">{{this.info}}</span></div><a
-                        class="movies-play" href="/play/{{this.url}}">▶&nbsp;播放</a>
+                        <span class="movie-score">{{this.score}}</span></div>
+                    <div class="movies-info"><span class="movie-name" style="display:block">{{this.title}}</span> <span
+                            class="movie-desc">{{this.info}}</span></div><a class="movies-play" href="/play/{{this.url}}">▶&nbsp;播放</a>
                 </li>{{/each}} {{/if}}</ul>
         </div>
         <div class="tvs-content">
             <ul class="movies-ul" id="tvs-content">{{#if (tvs)}} {{#each (tvs)}}<li><a class="movies-img" href="/play/{{this.url}}"><img
                             src="{{this.logo}}" alt=""></a>
                     <div class="movie-top"><span class="movie-num">影院正在热映</span> <span class="movie-vip">VIP</span>
-                        <span class="movie-score"><strong class="score-strong">8</strong>.7</span></div>
+                        <span class="movie-score" style="display:block">{{this.score}}</span></div>
                     <div class="movies-info"><span class="movie-name">{{this.title}}</span> <span class="movie-desc">{{this.info}}</span></div><a
                         class="movies-play" href="/play/{{this.url}}">▶&nbsp;播放</a>
                 </li>{{/each}} {{/if}}</ul>
