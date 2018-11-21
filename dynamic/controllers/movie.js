@@ -76,17 +76,19 @@ exports.addMovie = function (req, res, next) {
         let successNum = 0;
         let len = 0;
         movieList.forEach(function (item) {
+            let total = item.score.replace(/\D/g, '');
             // 获取数据信息
             let url = item.url;
             let title = item.title;
             let logo = item.logo;
             let info = item.info;
-            let score = item.score;
+            let score = total.substring(0, total.length - 1);
             let addtime = moment().format('YYYY-MM-DD HH:mm:ss');
             let playnum = 0;
             let commentnum = 0;
             let release_time = moment().format('YYYY-MM-DD HH:mm:ss');
             let type = '电影';
+            let little_socre = total.substring(total.length - 1);
 
             // 记录下当前的时间点
             // let time = +new Date();
@@ -103,7 +105,8 @@ exports.addMovie = function (req, res, next) {
                 commentnum,
                 addtime,
                 release_time,
-                type
+                type,
+                little_socre
             });
             movie.save(function (err, result) {
                 if (err) {

@@ -21,7 +21,7 @@ You have just won ${{number}}!
 {{#if (!xindex)}}
 
 {{success}}
-
+{{socre}}
 {{else}}
 this is a book
 {{/if}}
@@ -29,5 +29,9 @@ this is a book
     {{xindex}}<br>
     {{xcount}}<br>
 {{/each}}
+
+&lt;a&gt;百度一下&lt;/a&gt;
+
+ <a href="https://www.baidu.com/">百度一下</a>
 </body>
 </html>

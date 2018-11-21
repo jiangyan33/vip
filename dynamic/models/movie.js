@@ -18,7 +18,8 @@ function Movie(movie) {
     this.commentnum = movie.commentnum;
     this.release_time = movie.release_time;
     this.addtime = movie.addtime;
-    this.type = movie.type
+    this.type = movie.type;
+    this.little_socre=movie.little_socre;
 }
 
 
@@ -37,8 +38,8 @@ Movie.prototype.save = function (callback) {
             and id not in
 	            (select id from (select min(id) as id from movies group by url having count(url)>1) as temp2)
     * */
-    db.query('insert into movies values(null, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)', [
-        this.title, this.url, this.info, this.logo, this.score, this.playnum, this.commentnum, this.release_time, this.type
+    db.query('insert into movies values(null, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?,?)', [
+        this.title, this.url, this.info, this.logo, this.score, this.playnum, this.commentnum, this.release_time, this.type,this.little_socre
     ], function (err, result) {
         if (err) {
             return callback(err, null);

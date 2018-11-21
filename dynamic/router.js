@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 const router = express.Router();
 const config = require('./config');
-
+const db = require('./models/db');
 
 const indexController = require('./controllers/index');
 const userController = require('./controllers/user');
@@ -46,6 +46,20 @@ router.get('/showMovieAddDetails', movieController.showMovieAddDetails);
 router.post('/addMovie', movieController.addMovie);
 //测试xtpl使用数据
 router.get('/test', function (req, res) {
+    //操了，数据都搞没了
+    let sql = "select id,score from movies";
+    db.query(sql, (err, result) => {
+        result.forEach(element => {
+            let total = element['score'].replace(/\D/g, '');
+            element['score'] = total.substring(0, total.length - 1);
+            element['little_score'] = total.substring(total.length - 1);
+            db.query('update movies set score=?,little_score=? where id=?', [element['score'], element['little_score'], element['id']], (err, result) => {
+                console.log('11');
+            });
+        });
+
+    })
+
     let message = {
         students: [
             { name: '小明', age: 10 },
@@ -56,7 +70,8 @@ router.get('/test', function (req, res) {
             password: 123
         },
         success: true,
-        number: 1000
+        number: 1000,
+        socre: '<a>百度一下</a>'
     };
     return res.render('demo', message);
 })
