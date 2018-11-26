@@ -3,11 +3,11 @@
 
 const express = require('express');
 const app = express();
-const router = require('./router');
+const router = require('./router/router');
 const bodyParser = require('body-parser');
 const path = require('path');
 const session = require('express-session');
-const config = require('./config');
+const config = require('config')['app'];
 const server = require('http').createServer(app);
 const io = require('socket.io').listen(server);     // 引入socket.io模块， 并且绑定到服务器
 const log4js = require('./utils/log');
@@ -16,7 +16,7 @@ let usernum = 0;                        // 定义一个全局变量
 
 
 // 日志相关
-log4js.useLogger(app, logger)
+log4js.useLogger(app, logger);
 
 // 配置静态资源文件中间服务
 app.use('/www', express.static(path.join(__dirname, 'www')));
@@ -30,10 +30,9 @@ app.use(session({
     // cookie : {secure : true }
 }));
 
-
 // 配置解析POST请求体的中间件
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
 
 // 配置模板引擎中间件
 app.set('views', path.join(__dirname, 'views'));
@@ -47,7 +46,10 @@ app.locals.config = config;
 // 加载路由中间件（最后进入到路由）
 app.use(router);
 
-
+// 404 page
+app.use(function (req, res, next) {
+    return res.render('404');
+});
 // 错误信息处理机制
 if (config.isDebug) {
     app.use(function (err, req, res, next) {

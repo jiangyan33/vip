@@ -18,14 +18,8 @@ function Preview(preview) {
  * 获取电影详细信息
  * @param callback
  */
-Preview.getPreview = function (callback) {
-    db.query('select * from preview', function (err, result) {
-        if (err) {
-            callback(err, null);
-        }
-        callback(null, result);
-    });
+Preview.getPreview = async function (callback) {
+    return await db.query('select * from preview limit 0,7');
 }
-
 
 module.exports = Preview;

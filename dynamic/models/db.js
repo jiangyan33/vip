@@ -1,47 +1,32 @@
-"use strict";
-
-const mysql = require('mysql');
+const createPool = require('mysql2/promise').createPool;
+const config = require('config').get('db');
 
 
 // 创建一个数据库连接池
-var pool = mysql.createPool({
-    connectionLimit : 50,
-    host : 'localhost',
-    database : 'video',
-    user : 'root',
-    password : 'a1111111'
-})
+
+const pool = createPool(config);
 
 /**
  * 用于执行数据库的SQL语句
  * @param sql
- * @param p
- * @param c
+ * @param params
+ * @param callback
  */
-exports.query = function (sql, p, c) {
-    // 两个参数/三个参数
-    let params = [];
-    let callback;
+exports.query = async function (sql, params) {
 
-
-    // 开始进行参数的匹配
-    if (arguments.length === 2 && typeof arguments[1] === 'function') {
-        // 两个参数的话，第一个参数是SQL语句，第二个参数是回调函数
-        callback = p;
-    } else if (arguments.length === 3 && Array.isArray(p) && typeof arguments[2] === 'function') {
-        params = p;
-        callback = c;
-    } else {
-        throw new Error('Sorry, 参数个数不匹配或参数类型错误！');
+    // 传参校验
+    if (params) {
+        params = params.map(item => (item === undefined ? null : item));
     }
-
-
-    // 从数据库连接池中取出可以使用的链接
-    pool.getConnection(function (err, connection) {
-        connection.query(sql, params, function (err, rows) {
-            // 使用完毕放回去连接池中，然后释放链接
-            connection.release();
-            callback.apply(null, arguments);
-        });
-    })
+    if (process.env.NODE_ENV === 'development') {
+        console.log(sql);
+        console.log(params);
+    }
+    let connection = await pool.getConnection();
+    try {
+        let [rows, fields] = await connection.execute(sql, params);
+        return rows;
+    } finally {
+        connection.release();
+    }
 }

@@ -8,16 +8,13 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program1",
-            "program": "${workspaceFolder}/test.js"
+            "program": "${workspaceFolder}/test/test_async.js"
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "env": {
-                "NODE_ENV": "development"
-            },
-            "program": "${workspaceFolder}/dynamic/app.js"
+            "program": "${workspaceFolder}/app.js"
         }
     ]
 }

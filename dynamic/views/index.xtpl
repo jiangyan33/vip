@@ -110,7 +110,7 @@ function toggleMivieButton() {
                     type: "tv"
                 },
                 success: function(s) {
-                    if (s && 1 === s.code) {
+                    if (s) {
                         $("#pageNum").text(s.tvPageNum);
                         for (var e, n = 0,
                         a = s.tvs,
