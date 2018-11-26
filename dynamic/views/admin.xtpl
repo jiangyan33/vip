@@ -3,13 +3,13 @@
     <div class="register-form">
         <div class="form-title">视频上传</div>
         <div class="form-content">
-            <form action="/video/upload" method="post" class="form-group"><label for="uname" id="unamelb">视频名称</label>
+            <form action="/video/upload" method="post" class="form-group"><label for="uname" id="">视频名称</label>
                 <input type="text" placeholder="" name="name" id="uname" autofocus value="{{uname}}"> <label for="email"
                     id="emaillb">视频简介</label> <input type="text" placeholder="" name="email" id="email"> <label for="phone"
                     id="phonelb">图片</label> <input type="file" name="logo" id="phone"> <label for="pwd1"
                     id="pwd1lb">视频</label> <input type="file"  name="video" id="pwd1"> <label for="pwd2"
                     id="pwd2lb"></label> <input type="password" placeholder="确认密码" name="pwd2" id="pwd2"> 
-                <button type="submit">注册</button>
+                <button type="submit">上传</button>
             </form>
         </div>
     </div>

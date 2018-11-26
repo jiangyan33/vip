@@ -5,6 +5,11 @@ const app = express();
 const router = express.Router();
 const config = require('./config');
 const db = require('./models/db');
+const multer = require('multer');
+
+
+
+
 
 const indexController = require('./controllers/index');
 const userController = require('./controllers/user');
@@ -12,9 +17,10 @@ const playController = require('./controllers/play');
 const commentController = require('./controllers/comment');
 const movieController = require('./controllers/movie');
 const colmovieController = require('./controllers/moviecol');
-
-
+const adminController = require('./controllers/admin');
 // 前台路由控制中心-------------------------------------------------------------------------------------------------------------------
+
+//网站首页
 router.get('/', indexController.showIndex);                             // 用户首页信息的展示
 router.post('/index/:currentPage', indexController.showIndex);
 // 之前在用户注册/登录之前进行检查(花式路由的写法， 等价于把两者之间分开来写， 会按照数组里面的元素顺序依次执行)
@@ -27,8 +33,13 @@ router.get('/logout', userController.doLogout);                         // 用�
 router.get('/user', [checkNotLogin, userController.showUser]);                           // 显示用户中心
 router.post('/user', [checkNotLogin, userController.doUser]);                            // 用户修改信息之后提交数据
 router.post('/user/upload', [checkNotLogin, userController.uploadImage]);  // 图片上传
+
+//视频和评论
 router.get('/play', playController.showPlay);                           // 电影播放
-router.post('/play', playController.doPlay);                            // 播放页面的用户评论
+router.post('/play', playController.publishComment);                    // 播放页面的用户评论
+
+
+
 router.get('/play/:url', playController.showPlay);                      // 显示评论
 router.get('/play/current/:index', playController.showPlay);             // 实现上一集下一个的效果（随机效果）
 router.post('/play/colmovie/:tag', colmovieController.doColMovie);
@@ -37,6 +48,7 @@ router.get('/comment/:currentPage', commentController.showComment);             
 router.post('/colmovie/:currentPage', colmovieController.showUserColMovie);                 // 用户中心显示评论
 router.post('/userlog', userController.showUserlogs);                   // 用户中心显示日志
 router.get('/search', movieController.showSearchMovie);
+//在线搜索视频
 router.get('/search/:content', movieController.doSearchMovieOnline);
 router.post('/search', movieController.doSearchMovie);
 router.get('/addTV', movieController.doGetTVs);
@@ -45,6 +57,18 @@ router.get('/showMovieAddDetails', movieController.showMovieAddDetails);
 //将抓取的数据插入到数据库
 router.post('/addMovie', movieController.addMovie);
 //测试xtpl使用数据
+
+//上传视频
+router.get('/showAdmin', adminController.showAdmin);
+//upload.fields([{ video: 'avatar', maxCount: 1 }, { name: 'logo', maxCount: 1 }])
+let arr = [
+    { name: 'video', maxCount: 1 },
+    { name: 'logo', maxCount: 1 }
+];
+router.post('/video/upload', multer().fields(arr), adminController.upload);
+
+
+
 router.get('/test', function (req, res) {
     //操了，数据都搞没了
     let sql = "select id,score from movies";

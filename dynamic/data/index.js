@@ -44,25 +44,44 @@ exports.searchMovie = function (keyword, callback) {
             let $ = cheerio.load(html);
             //a标签的class属性，获取到的节点为
             /**
-             * <a class="figure  figure-180236 " data-qidanadd-albumid="229587901" data-qidanadd-episode="1"
-        data-qidanadd-channelid="22" data-qidanadd-tvid="1483394500" data-qidanadd-vip="0" data-widget-qidanadd="qidanadd"
-        data-searchpingback-elem="link" data-searchpingback-param="ptype=1-1" target="_blank" data-playsrc-elem="pic"
-        href="http://www.iqiyi.com/a_19rrh5tccx.html">
+           <a class="figure  figure-180236" data-qidanadd-exclusive="1" data-qidanadd-albumid="202723601" data-qidanadd-episode="1"
+    data-qidanadd-channelid="4" data-qidanadd-tvid="386425500" data-qidanadd-vip="0" data-widget-qidanadd="qidanadd"
+    data-widget-block="block" data-block-type="qs1404043" data-searchpingback-elem="link" data-searchpingback-param="ptype=1-1"
+    data-playsrc-elem="pic" href="http://www.iqiyi.com/lib/m_200256414.html?src=search" target="_blank">
+    <img width="140" height="187" alt="龙珠改" title="龙珠改" src="//pic7.iqiyipic.com/image/20181012/70/74/a_100012616_m_601_m3_180_236.jpg" />
+    <p class="video_dj " data-search-pay="ico" data-qidanadd-ele="definition"></p>
+    <p class="viedo_rb"><span class="icon-vInfo">98集全</span></p>
+</a>
              */
             let figures = $('.figure');
             /**
              * span标签的class属性     
              *  <span class="result_info_txt" data-detailinfo-elem="abstractinfo">孙悟空的哥哥拉蒂兹来到地球，透露了孙悟空原是战斗民族赛亚人的身份。孙悟空和比克联手对抗，然而因为双方战斗力的差距而落于苦战。孙悟空的儿子孙悟饭在关键时刻爆发强大战...</span>
-
              */
             let infos = $('.result_info_txt');
+            /**
+             * <p class="result-info-score clearfix">
+            <span class="fs20 lh18">8</span>
+            <span class="lh28">&nbsp;.9&nbsp;</span>
+        </p>
+             */
+            let score_total = $('.result-info-score');
             let res = [];
             figures.each(function (index) {
+                let img = $(figures[index]).children()['0'];
+                let imgSrc = 'http:' + img['attribs']['src'];
+                let movie_title = img['attribs']['title'];
                 let href = $(this).attr('href');
+                let socre = $(score_total[index]).children()[0].text().trim();
+                let little_score = $(score_total[index]).children()[1].text().trim().replace(/\D/g, '');
                 if (res.length < 3) {
                     res.push({
                         title: keyword,
                         url: href,
+                        img: imgSrc,
+                        score: socre,
+                        little_score: little_score,
+                        movie_title: movie_title,
                         info: $(infos[index]).text().trim()
                     });
                 }

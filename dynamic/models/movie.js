@@ -19,8 +19,9 @@ function Movie(movie) {
     this.release_time = movie.release_time;
     this.addtime = movie.addtime;
     this.type = movie.type;
-    this.little_socre=movie.little_socre;
+    this.little_socre = movie.little_socre;
 }
+
 
 
 /**
@@ -39,7 +40,7 @@ Movie.prototype.save = function (callback) {
 	            (select id from (select min(id) as id from movies group by url having count(url)>1) as temp2)
     * */
     db.query('insert into movies values(null, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?,?)', [
-        this.title, this.url, this.info, this.logo, this.score, this.playnum, this.commentnum, this.release_time, this.type,this.little_socre
+        this.title, this.url, this.info, this.logo, this.score, this.playnum, this.commentnum, this.release_time, this.type, this.little_socre
     ], function (err, result) {
         if (err) {
             return callback(err, null);
@@ -51,11 +52,11 @@ Movie.prototype.save = function (callback) {
             db.query('delete from movies where url  in ' +
                 '   (select url from (select url from movies group by url having count(url)>1) as tmp1) ' +
                 '       and id not in (select id from (select min(id) as id from movies group by url having count(url)>1) as temp2)', function (err, result) {
-                if (err) {
-                    return  callback(err, null);
-                }
-                callback(null, result);
-            });
+                    if (err) {
+                        return callback(err, null);
+                    }
+                    callback(null, result);
+                });
         }
 
     })
@@ -79,13 +80,13 @@ Movie.getAllMovies = function (callback) {
 
 
 /**
- * 获取当前的电影详情页面
+ * 获取当前页面的电影详情页面
  * @param params
  * @param callback
  */
 Movie.getMoviesByCurrentPage = function (params, callback) {
     db.query('select * from movies limit ?, ?', [
-            params.start, params.pageSize],
+        params.start, params.pageSize],
         function (err, result) {
             if (err) {
                 return callback(err, null);
@@ -101,7 +102,7 @@ Movie.getMoviesByCurrentPage = function (params, callback) {
  * @param callback
  */
 Movie.getMovieByUrl = function (url, callback) {
-    db.query('select * from movies where url = ?', [url],
+    db.query('select * from movies where url = ? limit 1', [url],
         function (err, result) {
             if (err) {
                 callback(err, null);
@@ -132,7 +133,7 @@ Movie.getMoviePageNums = function (callback) {
  * @param callback
  */
 Movie.getMovieByName = function (name, callback) {
-    db.query('select * from movies where title like ?', ['%'+name+'%'],
+    db.query('select * from movies where title like ?', ['%' + name + '%'],
         function (err, result) {
             if (err) {
                 return callback(err, null);
@@ -147,30 +148,43 @@ Movie.getMovieByName = function (name, callback) {
  * @param url
  * @param callback
  */
-Movie.updatePlayNumsByUrl = function(url, callback){
+Movie.updatePlayNumsByUrl = function (url, callback) {
     db.query('update movies set playnum = playnum +1 where url = ?', [url],
         function (err, result) {
-        if (err) {
-            return callback(err, null);
-        }
-        callback(null, result);
-    })
+            if (err) {
+                return callback(err, null);
+            }
+            callback(null, result);
+        })
 }
-
+/**
+ * 修改电影评论数量
+ * @param url
+ * @param callback
+ */
+Movie.updateCommentNumById = function (id, callback) {
+    db.query('update movies set commentnum = commentnum +1 where url = ?', [id],
+        function (err, result) {
+            if (err) {
+                return callback(err, null);
+            }
+            callback(null, result);
+        })
+}
 
 /**
  * 随机从数据库中国查询一条数据
  * @param id
  * @param callback
  */
-Movie.getOneRandomMovie = function(callback){
+Movie.getOneRandomMovie = function (callback) {
     db.query('select * from movies order by rand() limit 1',
         function (err, result) {
-        if (err) {
-            callback(err, null);
-        }
-        callback(null, result);
-    })
+            if (err) {
+                callback(err, null);
+            }
+            callback(null, result);
+        })
 }
 
 

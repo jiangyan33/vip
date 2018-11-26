@@ -26,7 +26,7 @@ exports.showMovieAddDetails = function (req, res, next) {
     let movieurl = req.app.locals.config.movieurl;
     // console.log(movieurl, '本轮数据抓取开始了');
 
-    // 开始专区数据信息
+    // 开始专区数据信息,现在主要不会使用前后端分离的实践
     getMovieDetails(req, movieurl, function (err, result) {
         if (err) {
             return next(err);
@@ -122,8 +122,6 @@ exports.addMovie = function (req, res, next) {
                     })
                 }
             });
-
-
         })
     }
 }
@@ -473,10 +471,10 @@ exports.doSearchMovieOnline = function (req, res, next) {
         } else {
             movies.forEach(function (element) {
                 let url = element.url;
-                element.url = url.substring(url.lastIndexOf('/') + 1)
-                element.addtime = moment().format('YYYY-MM-DD')
-                if (element.info.toString().length > 20) {
-                    element.info = element.info.toString().substring(0, 30);
+                element.url = url.substring(url.lastIndexOf('/') + 1);
+                element.addtime = moment().format('YYYY-MM-DD');
+                if (element.info.toString().length > 50) {
+                    element.info = element.info.toString().substring(0, 50);
                 }
             })
             // 返回抓取的所有信息

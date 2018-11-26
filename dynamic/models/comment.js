@@ -79,16 +79,14 @@ Comment.getCommentsList = function (callback) {
  * @param callback
  */
 Comment.getCommentByCurrentPage = function (params, callback) {
-    //console.log(params)
-    // select * from table limit (pageNo-1)*pageSize, pageSize;
-    db.query('select users.id, users.uname, users.face, comments.addtime, comments.content from users, comments where users.id = comments.user_id ORDER BY comments.addtime desc LIMIT  ?, ?',
-        [params.start, params.pageSize],
+    db.query('select users.id, users.uname, users.face, comments.addtime, comments.content from users, comments where users.id = comments.user_id and movie_id=? ORDER BY comments.addtime desc LIMIT  ?, ?',
+        [params.movie_id, params.start, params.pageSize],
         function (err, result) {
-        if (err) {
-            callback(err, null);
-        }
-        callback(null, result);
-    })
+            if (err) {
+                callback(err, null);
+            }
+            callback(null, result);
+        })
 }
 
 
@@ -96,8 +94,8 @@ Comment.getCommentByCurrentPage = function (params, callback) {
  * 获取评论的总页数
  * @param callback
  */
-Comment.getCommentNums = function (callback) {
-    db.query('select count(*) as pageNums from comments', [], function (err, result) {
+Comment.getCommentNums = function (movie_id, callback) {
+    db.query('select count(*) as pageNums from comments', [movie_id], function (err, result) {
         if (err) [
             callback(err, null)
         ]

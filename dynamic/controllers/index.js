@@ -103,7 +103,6 @@ exports.showIndex = function (req, res, next) {
 
             })
         })
-
     }
 
 }

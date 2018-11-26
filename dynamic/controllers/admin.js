@@ -12,9 +12,9 @@ const User = require('../models/user');
  * @param next
  */
 exports.showAdmin = function (req, res, next) {
-    if (req.session.user && req.session.user.id === 1) {
-        return res.render('admin/admin');
-    }
+    // if (req.session.user && req.session.user.id === 1) {
+    return res.render('admin');
+    // }
 }
 
 
@@ -106,8 +106,8 @@ exports.showUserList = function (req, res, next) {
             }
             if (result) {
                 return res.json({
-                    code : 1,
-                    user : result
+                    code: 1,
+                    user: result
                 })
             }
 
@@ -226,5 +226,13 @@ exports.showPreview = function (req, res, next) {
         }
         res.render('admin/previewlist');
     })*/
+}
+
+/**
+ * 上传视频
+ */
+exports.upload = function (req, res) {
+    console.log(req.body);
+    return res.json({ 'message': 'ok' });
 }
 

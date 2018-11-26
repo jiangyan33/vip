@@ -79,7 +79,7 @@ function toggleMivieButton() {
             $(".animes-content").hide(),
             $.ajax({
                 url: "/index/1",
-                type: "POST",
+                type: "post",
                 dataType: "json",
                 data: {
                     type: "movie"
@@ -104,7 +104,7 @@ function toggleMivieButton() {
             $("#pageNow").text("1"),
             $.ajax({
                 url: "/index/1",
-                type: "POST",
+                type: "post",
                 dataType: "json",
                 data: {
                     type: "tv"
@@ -172,7 +172,7 @@ function activePaginaton() {
         $("#pageNow").html(i),
         $.ajax({
             url: "/index/" + i,
-            type: "POST",
+            type: "post",
             dataType: "json",
             data: {
                 type: c

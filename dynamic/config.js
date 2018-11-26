@@ -12,5 +12,7 @@ module.exports = {
     movieDir: path.join(__dirname, 'www', 'uploads', 'movie'),
     movieurl: 'http://vip.iqiyi.com/hot.html?cid=1',                       // 电影地址，
     movielist: [],                                                         // 存储了用户获取的电影列表信息
+    //视频解析接口
+    parseUrl: 'https://cdn.yangju.vip/k/?url=',
     userlist: 0
 }
