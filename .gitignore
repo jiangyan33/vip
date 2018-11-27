@@ -7,6 +7,7 @@ node_modules
 dynamic/node_modules
 dynamic/www
 dynamic/dist
+dynamic/logs
 # config
 config/*ls
 !config/default.js

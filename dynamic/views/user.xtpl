@@ -18,7 +18,7 @@
                             style="color:#5d5d5d;font-weight:700"> <label for="email" id="emaillb">邮箱</label> <input
                             type="text" placeholder="邮箱" name="email" id="email" value="{{user.email}}"> <label for="phone"
                             id="phonelb">手机</label> <input type="text" placeholder="手机" name="phone" id="phone" value="{{user.phone}}">
-                        <label for="logo">图像</label> <img src="{{user.face}}" alt="" id="logo"> <input type="hidden"
+                        <label for="logo">图像</label> <img src="{{user.face}}" weight="200" height="80" alt="" id="logo"> <input type="hidden"
                             name="face" value="{{user.face}}"> <a class="upload" id="upload">上传图像</a> <label for="desc">简介</label>
                         <textarea name="info" id="desc" cols="30" rows="10">{{user.info}}</textarea> <button type="submit">保存修改</button></form>
                 </div>

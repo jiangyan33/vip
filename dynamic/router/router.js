@@ -32,7 +32,7 @@ router.post('/login', userController.doLogin);                          // 用�
 router.get('/logout', userController.doLogout);                         // 用户退出
 router.get('/user', [checkNotLogin, userController.showUser]);                           // 显示用户中心
 router.post('/user', [checkNotLogin, userController.doUser]);                            // 用户修改信息之后提交数据
-router.post('/user/upload', [checkNotLogin, upload.single('pic'), userController.uploadImage]);  // 图片上传
+router.post('/user/upload', [ upload.single('pic'), userController.uploadImage]);  // 图片上传
 router.get('/captcha', userController.getCaptcha);                // 获取验证码
 router.post('/userlog', userController.showUserlogs);                   // 用户中心显示日志
 //checkNotLogin
