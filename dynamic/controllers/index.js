@@ -4,13 +4,12 @@ const Movie = require('../models/movie');
 const Preview = require('../models/preview');
 const TV = require('../models/tv');
 const ResponseWrapper = require('../utils/response_wrapper');
-
+const logger = require('./utils/log').getLogger();
 
 /**
  * 显示首页信息
  * @param req
  * @param res
- * @param next
  */
 exports.showIndex = async function (req, res) {
     let response_wrapper = new ResponseWrapper(res);
@@ -21,7 +20,7 @@ exports.showIndex = async function (req, res) {
     let params = {
         start: (pageNow - 1) * pageSize,
         pageSize: pageSize
-    }
+    };
     let type = req.body.type;
     try {
         if (type === 'tv') {
@@ -67,6 +66,8 @@ exports.showIndex = async function (req, res) {
             });
         }
     } catch (error) {
-        response_wrapper.error('HANDLE_ERROR');
+        //写错误日志，可以加上接口的名称
+        logger.error(error);
+        return response_wrapper.error('HANDLE_ERROR');
     }
 }

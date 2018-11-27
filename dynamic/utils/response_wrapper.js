@@ -35,19 +35,19 @@ ResponseWrapper.prototype.error = function (type, desc, data) {
     });
 }
 
-ResponseWrapper.prototype.succ = function (data) {
-    this.res.status(200);
-    return this.res.json({
-        code: RETURN_CODE['OK'],
-        msg: RETURN_MSG['OK'],
-        data: data,
-    });
-}
+// ResponseWrapper.prototype.succ = function (data) {
+//     this.res.status(200);
+//     return this.res.json({
+//         code: RETURN_CODE['OK'],
+//         msg: RETURN_MSG['OK'],
+//         data: data,
+//     });
+// }
 
-ResponseWrapper.prototype.send = function (data) {
-    this.res.status(200);
-    data.data = data.data || null;
-    return this.res.json(data);
-}
+// ResponseWrapper.prototype.send = function (data) {
+//     this.res.status(200);
+//     data.data = data.data || null;
+//     return this.res.json(data);
+// }
 
 module.exports = ResponseWrapper;

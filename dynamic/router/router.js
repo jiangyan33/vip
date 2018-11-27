@@ -11,7 +11,7 @@ const multer = require('multer');
 
 
 const indexController = require('../controllers/index');
-// const userController = require('../controllers/user');
+const userController = require('../controllers/user');
 // const playController = require('../controllers/play');
 // const commentController = require('../controllers/comment');
 // const movieController = require('../controllers/movie');
@@ -22,16 +22,17 @@ const indexController = require('../controllers/index');
 //网站首页
 router.get('/', indexController.showIndex);                             // 用户首页信息的展示
 router.post('/index/:currentPage', indexController.showIndex);
-// 之前在用户注册/登录之前进行检查(花式路由的写法， 等价于把两者之间分开来写， 会按照数组里面的元素顺序依次执行)
-// router.get('/register', [checkLogin, userController.showRegister]);
-// router.post('/register', userController.doRegister);                    // 用户注册页面提交
-// // 登录之前先来检查一下
-// router.get('/login', [checkLogin, userController.showLogin]);           // 用户登录页面
-// router.post('/login', userController.doLogin);                          // 用户登录
-// router.get('/logout', userController.doLogout);                         // 用户退出
-// router.get('/user', [checkNotLogin, userController.showUser]);                           // 显示用户中心
-// router.post('/user', [checkNotLogin, userController.doUser]);                            // 用户修改信息之后提交数据
-// router.post('/user/upload', [checkNotLogin, userController.uploadImage]);  // 图片上传
+
+
+//用户模块
+router.get('/register', [checkLogin, userController.showRegister]);
+router.post('/register', userController.doRegister);                    // 用户注册页面提交
+router.get('/login', [checkLogin, userController.showLogin]);           // 用户登录页面
+router.post('/login', userController.doLogin);                          // 用户登录
+router.get('/logout', userController.doLogout);                         // 用户退出
+router.get('/user', [checkNotLogin, userController.showUser]);                           // 显示用户中心
+router.post('/user', [checkNotLogin, userController.doUser]);                            // 用户修改信息之后提交数据
+router.post('/user/upload', [checkNotLogin, userController.uploadImage]);  // 图片上传
 
 // //视频和评论
 // router.get('/play', playController.showPlay);                           // 电影播放
@@ -113,16 +114,15 @@ router.post('/index/:currentPage', indexController.showIndex);
 
 
 // 路由跳转检查中心-------------------------------------------------------------------------------------------------------------------
-// function checkLogin(req, res, next) {
-//     // 如果用户登录成功的话(已经登录的用户就不能访问注册页面了，直接跳转到用户首页)
-//     if (req.session.user) {
-//         // 直接跳转到首页去
-//         return res.redirect('/');
-//     }
-//     //res.render('register');
-//     // 如果用户没有登陆的话就继续向下执行， next（）之后就会执行下一个中间件
-//     next();
-// }
+function checkLogin(req, res, next) {
+    // 如果用户登录成功的话(已经登录的用户就不能访问注册和登陆页面了，直接跳转到用户首页)
+    if (req.session.user) {
+        // 直接跳转到首页去
+        return res.redirect('/');
+    }
+    // 如果用户没有登陆的话就继续向下执行， next（）之后就会执行下一个中间件
+    next();
+}
 
 // function checkNotLogin(req, res, next) {
 //     // 如果没有登录就直接跳转到首页

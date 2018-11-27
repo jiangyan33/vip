@@ -10,10 +10,9 @@ const session = require('express-session');
 const config = require('config')['app'];
 const server = require('http').createServer(app);
 const io = require('socket.io').listen(server);     // 引入socket.io模块， 并且绑定到服务器
-const log4js = require('./utils/log');
-const logger = log4js.getLogger();
-let usernum = 0;                        // 定义一个全局变量
-
+const logger = require('./utils/log').getLogger;
+// 定义一个全局变量
+let usernum = 0;
 
 // 日志相关
 log4js.useLogger(app, logger);
@@ -47,19 +46,19 @@ app.locals.config = config;
 app.use(router);
 
 // 404 page
-app.use(function (req, res, next) {
+app.use(function (req, res) {
     return res.render('404');
 });
 // 错误信息处理机制
 if (config.isDebug) {
     app.use(function (err, req, res, next) {
-        // res.send('500, Interal Server Error'+ err);
-        console.log(err)
+        console.log(err);
+        res.status(500).send('Interal Server Error:' + err);
     })
 } else {
     app.use(function (err, req, res, next) {
-        // res.send('500, Interal Server Error'+ err);
         logger.info(err);
+        res.send('500, Interal Server Error:' + err);
     })
 }
 
@@ -68,8 +67,6 @@ if (config.isDebug) {
 server.listen(8080, 'localhost', function () {
     console.log('Server is listening at port 8080…………');
 })
-
-
 
 // websocket server
 io.on('connection', function (socket) {

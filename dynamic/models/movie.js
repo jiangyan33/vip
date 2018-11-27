@@ -32,7 +32,7 @@ Movie.prototype.save = async function () {
 
 
 /**
- * 获取所有的电影对象,这个不提供
+ * 获取所有的电影对象,这个不提供,返回数据量太大，用不到
  */
 // Movie.getAllMovies = function (callback) {
 //     db.query('select * from movies', [],
