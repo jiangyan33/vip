@@ -4,7 +4,7 @@ const Movie = require('../models/movie');
 const Preview = require('../models/preview');
 const TV = require('../models/tv');
 const ResponseWrapper = require('../utils/response_wrapper');
-const logger = require('./utils/log').getLogger();
+const logger = require('../utils/log').getLogger();
 
 /**
  * 显示首页信息

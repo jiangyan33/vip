@@ -10,7 +10,10 @@ const session = require('express-session');
 const config = require('config')['app'];
 const server = require('http').createServer(app);
 const io = require('socket.io').listen(server);     // 引入socket.io模块， 并且绑定到服务器
-const logger = require('./utils/log').getLogger;
+
+const log4js = require('./utils/log');
+const logger = log4js.getLogger();
+
 // 定义一个全局变量
 let usernum = 0;
 

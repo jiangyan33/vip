@@ -4,15 +4,14 @@
 const svgCaptcha = require('svg-captcha');
 const User = require('../models/user');
 const utility = require('utility');   // 需要的MD5加密工具包
-const formidable = require('formidable');
 const path = require('path');
 const fs = require('fs');
 const utils = require('../utils/utils');
 const Userlog = require('../models/userlog');
 const moment = require('moment');
 const ResponseWrapper = require('../utils/response_wrapper');
-const logger = require('./utils/log').getLogger();
-
+const logger = require('../utils/log').getLogger();
+const uuidv1 = require('uuid/v1');
 /**
  * 展示用户注册的页面信息
  * @param req
@@ -22,8 +21,6 @@ exports.showRegister = function (req, res) {
     // 由于之前已经配置了页面跳转的中间件，这里就直接跳转到这个注册页面就行
     res.render('register');
 }
-
-
 /**
  * 用户点击注册按钮之后的业务逻辑
  * @param req
@@ -47,27 +44,27 @@ exports.doRegister = async function (req, res) {
         }
         // 3. 验证码输入正确的前提下，开始去数据库中获取用户名信息，如果没有该用户信息，就把数据信息保存起来存储到数据库中去
         // 如果已经存在了这个用户的话，就去告诉用户数据已经存在了
-        if (await User.getUserByName(uname)) {
+        if ((await User.getUserByName(uname)).length) {
             return response(res, 1002, '用户名已存在');
         }
         // 开始进行数据加密(对用户的密码进行双重加密+加上自己的密匙)
         pwd2 = utility.md5(pwd2);
         // 对密码进行再次加密
-        pwd2 = utility.md5(pwd2 + req.app.locals.config.secretKey);
+        let pwd = utility.md5(pwd2 + req.app.locals.config.secretKey);
 
         // 开始插入数据到数据库
         let user = new User({
             uname,
             email,
             phone,
-            pwd2,
+            pwd,
             addtime,
             info,
             face
         });
         let registerResult = await user.save();
         //TODD  对受影响的行数进行判断
-        if (registerResult) {
+        if (registerResult.affectedRows <= 0) {
             return response(res, 0, 'faild');
         }
         // 用户注册成功的话，把当前插入的用户ID保存起来（唯一性，后面可以直接通过这个ID去获取这个用户的详细信息）
@@ -79,24 +76,18 @@ exports.doRegister = async function (req, res) {
         return response_wrapper.error('HANDLE_ERROR');
     }
 };
-
-
 /**
  * 开始进入到登陆页面
  * @param req
  * @param res
- * @param next
  */
 exports.showLogin = function (req, res) {
     res.render('login');
 }
-
-
 /**
  * 处理用户提交的数据信息
  * @param req
  * @param res
- * @param next
  */
 exports.doLogin = async function (req, res) {
     let response_wrapper = new ResponseWrapper(res);
@@ -114,7 +105,8 @@ exports.doLogin = async function (req, res) {
             return response(res, 1001, '验证码输入错误')
         }
         // 获取用户IP详细信息
-        if (await utils.getIPInfo(ip)) {
+        let result = await utils.getIPInfo(ip);
+        if (result) {
             address = result.data.country + result.data.region + result.data.city + result.data.isp;
         }
         // 2. 开始校验（防止用户端禁用js）， 查询比对的实际上是加密过后的数据信息
@@ -124,7 +116,7 @@ exports.doLogin = async function (req, res) {
         // 3. 开始具体的业务逻辑校验
         // 3.1 用户是否存在（根据用户名查询出来用户记录信息）
         let userInfo = await User.getUserByName(uname);
-        if (userInfo.length) {
+        if (!userInfo.length) {
             return response(res, 0, '该用户不存在');
         }
         // 用户存在的话就开始校验密码是否正确
@@ -151,13 +143,10 @@ exports.doLogin = async function (req, res) {
         return response_wrapper.error('HANDLE_ERROR');
     }
 }
-
-
 /**
  * 进入用户管理中心的界面
  * @param req
  * @param res
- * @param next
  */
 exports.showUser = function (req, res) {
     return res.render('user', {
@@ -165,13 +154,10 @@ exports.showUser = function (req, res) {
         user: req.session.user
     });
 }
-
-
 /**
  * 实现用户的退出
  * @param req
  * @param res
- * @param next
  */
 exports.doLogout = function (req, res) {
     // 清空user的session，然后退出首页
@@ -179,8 +165,6 @@ exports.doLogout = function (req, res) {
     // 直接跳转到首页
     return res.redirect('/');
 }
-
-
 /**
  * 处理文件上传的请求
  * @param req
@@ -190,44 +174,29 @@ exports.doLogout = function (req, res) {
 exports.uploadImage = async function (req, res) {
     let response_wrapper = new ResponseWrapper(res);
     try {
-        let form = new formidable.IncomingForm();
-        // 默认把用户上传的图片放在了一个临时目录中， 但是这个文件是没有后缀名称的(文件上传路径)
-        // 这里从配置文件中读取数据信息
-        // form.uploadDir = './www/uploads';
-        form.uploadDir = path.join(__dirname, '../www/uploads');
-
-        // console.log("开始上传文件了");
-        // 如果只在这里接受图片类型。需要进行后缀名判断
-        // 这个第三方包默认是把路径放在了一个临时文件夹下面（temp文件夹）
-
-
-        let parseAsync = utils.convert(form.parse);
-        let { fileds, files } = await parseAsync(req);
-        // filds里面存储了传递过来的字段信息（使用FormData可以实现异步上传一个二进制文件 ）
-        // 开始移动文件到我的网站目录下面(键值对的方式来获取图片数据)[这里要与前台的键值对一致]
-        let pic = files.pic;
+        // formidable的parse方法没有找到异步的写法，放弃了
+        let pic = req.file;
         let size = pic.size;
         // 1MB 的大小
         if (size > 1024 * 1024) {
             return response(req, 0, '请不要上传大于1MB的文件！');
         }
-        // 不包含文件后缀
-        let tempPath = pic.path;
-        let extName = path.extname(pic.name);
-        // 新的文件路径名称(包含文件后缀)
-        let newpath = tempPath + extName;
+        // 随机生成的
+        let filename = uuidv1() + path.extname(pic.originalname);
         //现在只修改的session中的数据，等修改的所有信息提交时再更新数据库
-        req.session.user.face = `/www/uploads/avatar/${path.basename(newpath)}`;
-
+        let filePath = '/www/uploads/avatar/' + filename;
+        req.session.user.face = filePath;
+        let writeFileSync = utils.convert(fs.writeFile);
+        writeFileSync(path.join(__dirname, '../www/uploads/avatar/' + filename), pic.buffer);
         //【error】 原生的nodejs是不支持跨盘符来移动数据的
         // 移动文件到新的目录下面（临时目录到网站的根目录）
-        let renameAsync = utils.convert(fs.rename);
-        await renameAsync(tempPath, newpath);
+        // let renameAsync = utils.convert(fs.rename);
+        // await renameAsync(tempPath, newpath);
         // 刷新当前页面信息（这里类似于302 重定向）
         // 【注意】对于ajax请求这里是不能这样操作的
         // ajax这里需要返回一个JSON字符串,
         // 前台页面的刷新window.location..reload('') 和 window.location.href ='' (会跳转到一个新的URL地址)
-        return response(res, 1, `/www/uploads/avatar/${path.basename(newpath)}${extName}`);
+        return response(res, 1, filePath);
         // 修改服务器端的图片大小
         // 开始修改图片的大小(! 表示强制裁剪图像)
         /*gm(newpath).resize(100, 100).write(newpath, function (err) {
@@ -249,7 +218,7 @@ exports.uploadImage = async function (req, res) {
  * @param res
  * @param next
  */
-exports.doUser = function (req, res) {
+exports.doUser = async function (req, res) {
     let response_wrapper = new ResponseWrapper(res);
     try {
         // 1. 获取表单参数信息
@@ -286,6 +255,8 @@ exports.doUser = function (req, res) {
         }
         let user = new User({ id, uname, pwd, email, phone, info, face });
         let result = await user.update();
+        //更新一下session中的数据
+        req.session.user = user;
         if (result.changedRows > 0) {
             // 开始修改
             //当修改密码时才清空session
@@ -357,4 +328,14 @@ function response(res, code, msg) {
     });
 }
 
-
+// function parseAsync(req, func) {
+//     return new Promise((resolve, reject) => {
+//         func(req, function (err, fileds, files) {
+//             if (err) {
+//                 reject(err);
+//             } else {
+//                 resolve(fileds, files);
+//             }
+//         })
+//     })
+// }

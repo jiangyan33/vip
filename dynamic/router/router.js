@@ -1,10 +1,10 @@
 
 const express = require('express');
-const app = express();
+// const app = express();
 const router = express.Router();
-const config = require('config');
-const db = require('../models/db');
-const multer = require('multer');
+// const config = require('config');
+// const db = require('../models/db');
+const upload = require('multer')();
 
 
 
@@ -32,7 +32,10 @@ router.post('/login', userController.doLogin);                          // 用�
 router.get('/logout', userController.doLogout);                         // 用户退出
 router.get('/user', [checkNotLogin, userController.showUser]);                           // 显示用户中心
 router.post('/user', [checkNotLogin, userController.doUser]);                            // 用户修改信息之后提交数据
-router.post('/user/upload', [checkNotLogin, userController.uploadImage]);  // 图片上传
+router.post('/user/upload', [checkNotLogin, upload.single('pic'), userController.uploadImage]);  // 图片上传
+router.get('/captcha', userController.getCaptcha);                // 获取验证码
+router.post('/userlog', userController.showUserlogs);                   // 用户中心显示日志
+//checkNotLogin
 
 // //视频和评论
 // router.get('/play', playController.showPlay);                           // 电影播放
@@ -43,10 +46,10 @@ router.post('/user/upload', [checkNotLogin, userController.uploadImage]);  // �
 // router.get('/play/:url', playController.showPlay);                      // 显示评论
 // router.get('/play/current/:index', playController.showPlay);             // 实现上一集下一个的效果（随机效果）
 // router.post('/play/colmovie/:tag', colmovieController.doColMovie);
-// router.get('/captcha', userController.getCaptcha);                      // 获取验证码
+
 // router.get('/comment/:currentPage', commentController.showComment);                 // 用户中心显示评论
 // router.post('/colmovie/:currentPage', colmovieController.showUserColMovie);                 // 用户中心显示评论
-// router.post('/userlog', userController.showUserlogs);                   // 用户中心显示日志
+
 // router.get('/search', movieController.showSearchMovie);
 // //在线搜索视频
 // router.get('/search/:content', movieController.doSearchMovieOnline);
@@ -124,14 +127,14 @@ function checkLogin(req, res, next) {
     next();
 }
 
-// function checkNotLogin(req, res, next) {
-//     // 如果没有登录就直接跳转到首页
-//     if (!req.session.user) {
-//         return res.redirect('/');
-//     }
-//     // 就执行下一个中间件
-//     next();
-// }
+function checkNotLogin(req, res, next) {
+    // 如果没有登录就直接跳转到首页
+    if (!req.session.user) {
+        return res.redirect('/');
+    }
+    // 就执行下一个中间件
+    next();
+}
 
 
 module.exports = router;

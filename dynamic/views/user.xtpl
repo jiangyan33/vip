@@ -174,8 +174,7 @@
                                         if (t && 1 === t.code) {
                                             var n = t.msg;
                                             $("#toastWindow").hide(),
-                                                $("#logo").attr("src", n),
-                                                window.location.href = "/"
+                                                $("#logo").attr("src", n)
                                         }
                                     }
                                 },
@@ -272,7 +271,7 @@
                         },
                         success: function (e) {
                             if (e && 1 === e.code) {
-                                for (var t, n = e.userlogs,
+                                for (var t, n = e.msg,
                                     o = 0,
                                     s = n.length,
                                     a = "<tr>\n                        <td>编号</td>\n                        <td>登录时间</td>\n                        <td>登录IP</td>\n                        <td>登录地址</td>\n                    </tr>"; o < s; o++) t = n[o],

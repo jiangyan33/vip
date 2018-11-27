@@ -53,7 +53,7 @@ User.deleteUserById = async function (id) {
 /**
  * 函数的原型方法（使用之前需要先new 一个实例对象， 然后就可以在线面直接使用this 这个属性了，  原型方法是子类实例都可以循环调用的）
  */
-User.prototype.save = async function (callback) {
+User.prototype.save = async function () {
     // 这里直接使用mysql中内置的这个now()函数获取当前的时间信息
     let params = [this.uname, this.pwd, this.email, this.phone, this.info, this.face];
     return await db.query('insert into users values(null, ?, ?, ?, ?, ?, ?, Now())', params);
@@ -63,7 +63,7 @@ User.prototype.save = async function (callback) {
 /**
  * 修改用户信息
  */
-User.prototype.update = async function (callback) {
+User.prototype.update = async function () {
     //console.log('数据库中信息--------------------------', this)
     let params = [this.pwd, this.email, this.phone, this.info, this.face, this.id];
     return await db.query('update users set  pwd = ?, email = ?, phone = ?, info = ?, face = ? where id = ?', params);
@@ -74,7 +74,7 @@ User.prototype.update = async function (callback) {
  * update user info
  * @param callback
  */
-User.prototype.updateinfo = async function (callback) {
+User.prototype.updateinfo = async function () {
     let params = [this.email, this.phone, this.info, this.id];
     return await db.query('update users set email = ?, phone = ?, info = ? where id = ?', params);
 }

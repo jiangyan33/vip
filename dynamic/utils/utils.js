@@ -1,7 +1,6 @@
 "use strict";
 
 const request = require('request');
-
 /**
  * 获取IP的详细信息
  * @param ip
@@ -13,8 +12,8 @@ exports.getIPInfo = async function (ip, callback) {
 
     let requestGetAsync = convert(request.get);
     try {
-        let result = await requestGetAsync.get(url);
-        return JSON.parse(result);
+        let result = await requestGetAsync(url);
+        return JSON.parse(result[1]);
     } catch (error) {
         console.log(error);
         return null;
@@ -26,7 +25,7 @@ exports.getHtmlText = (html) => {
 }
 
 //将异步操作变为同步操作的通用函数
-exports.convert = function (orginFunc) {
+let convert = function (orginFunc) {
     return async function () {
         const that = this;
         //原方法对应的参数
@@ -47,3 +46,5 @@ exports.convert = function (orginFunc) {
         });
     };
 };
+
+exports.convert = convert;
