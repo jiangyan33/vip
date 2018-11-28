@@ -12,10 +12,10 @@ const upload = require('multer')();
 
 const indexController = require('../controllers/index');
 const userController = require('../controllers/user');
-// const playController = require('../controllers/play');
-// const commentController = require('../controllers/comment');
+const playController = require('../controllers/play');
+const commentController = require('../controllers/comment');
 // const movieController = require('../controllers/movie');
-// const colmovieController = require('../controllers/moviecol');
+const colmovieController = require('../controllers/moviecol');
 // const adminController = require('../controllers/admin');
 // 前台路由控制中心-------------------------------------------------------------------------------------------------------------------
 
@@ -32,23 +32,22 @@ router.post('/login', userController.doLogin);                          // 用�
 router.get('/logout', userController.doLogout);                         // 用户退出
 router.get('/user', [checkNotLogin, userController.showUser]);                           // 显示用户中心
 router.post('/user', [checkNotLogin, userController.doUser]);                            // 用户修改信息之后提交数据
-router.post('/user/upload', [ upload.single('pic'), userController.uploadImage]);  // 图片上传
+router.post('/user/upload', [upload.single('pic'), userController.uploadImage]);  // 图片上传
 router.get('/captcha', userController.getCaptcha);                // 获取验证码
 router.post('/userlog', userController.showUserlogs);                   // 用户中心显示日志
-//checkNotLogin
-
-// //视频和评论
-// router.get('/play', playController.showPlay);                           // 电影播放
-// router.post('/play', playController.publishComment);                    // 播放页面的用户评论
+router.get('/comment/:currentPage', commentController.showUserComment);                 // 用户中心显示评论
 
 
-
-// router.get('/play/:url', playController.showPlay);                      // 显示评论
+//播放模块
+router.get('/play', playController.showPlay);                           // 电影播放
+router.post('/play', playController.publishComment);                    // 播放页面的用户评论
+router.get('/play/:url', playController.showPlay);                      // 显示评论
+router.get('/comment', commentController.showMovieComment)     //播放页面的评论信息
 // router.get('/play/current/:index', playController.showPlay);             // 实现上一集下一个的效果（随机效果）
-// router.post('/play/colmovie/:tag', colmovieController.doColMovie);
+router.post('/play/colmovie/:tag', colmovieController.doColMovie);
 
-// router.get('/comment/:currentPage', commentController.showComment);                 // 用户中心显示评论
-// router.post('/colmovie/:currentPage', colmovieController.showUserColMovie);                 // 用户中心显示评论
+
+router.post('/colmovie/:currentPage', colmovieController.showUserColMovie);                 // 用户中心显示评论
 
 // router.get('/search', movieController.showSearchMovie);
 // //在线搜索视频

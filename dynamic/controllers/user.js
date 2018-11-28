@@ -187,43 +187,15 @@ exports.uploadImage = async function (req, res, next) {
         //现在只修改的session中的数据，等修改的所有信息提交时再更新数据库
         let filePath = '/www/uploads/avatar/' + filename;
         req.session.user.face = filePath;
-        //先写入文件，然后再读出来变小
         let temp_path = path.join(__dirname, '../www/uploads/avatar/' + filename);
         fs.writeFileSync(temp_path, pic.buffer);
         return response(res, 1, filePath);
-        //【error】 原生的nodejs是不支持跨盘符来移动数据的
-        // 移动文件到新的目录下面（临时目录到网站的根目录）
-        // let renameAsync = utils.convert(fs.rename);
-        // await renameAsync(tempPath, newpath);
-        // 刷新当前页面信息（这里类似于302 重定向）
-        // 【注意】对于ajax请求这里是不能这样操作的
-        // ajax这里需要返回一个JSON字符串,
-        // 前台页面的刷新window.location..reload('') 和 window.location.href ='' (会跳转到一个新的URL地址)
-        // 修改服务器端的图片大小
-        // 开始修改图片的大小(! 表示强制裁剪图像)
-        /**
-         * gm(buf, 'image.jpg')
-.noise('laplacian')
-.write('/path/to/out.jpg', function (err) {
-  if (err) return handle(err);
-  console.log('Created an image from a Buffer!');
-});
-         */
-
-
-        // gm(newpath).resize(100, 100).write(newpath, function (err) {
-        //     if (err) {
-        //         return next(err);
-        //     }
-        // })
     } catch (error) {
         //写错误日志
         logger.error(error);
         return response_wrapper.error('HANDLE_ERROR');
     }
 }
-
-
 /**
  * 用于修改用户的详细信息
  * @param req

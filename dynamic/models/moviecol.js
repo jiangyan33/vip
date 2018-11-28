@@ -14,64 +14,31 @@ function MovieCol(moviecol) {
 
 /**
  * 保存用户收藏的电影信息
- * @param callback
  */
-MovieCol.prototype.save = function (callback) {
-    db.query('insert into colmovie values (null, ?, ?, NOW())',
-        [this.movie_url, this.user_id], function (err, result) {
-            if (err) {
-                return callback(err, null);
-            }
-            callback(null, result);
-        })
+MovieCol.prototype.save = async function () {
+    return await db.query('insert into colmovie values (null, ?, ?, NOW())', [this.movie_url, this.user_id]);
 }
-
-
 /**
  * 获取收藏信息
- * @param callback
  */
-MovieCol.getMovieColByUserId = function (uid, callback) {
-    db.query('select * from colmovie where user_id = ?', [uid], function (err, result) {
-        if (err) {
-            return callback(err, null);
-        }
-        callback(null, result);
-    })
+MovieCol.getMovieColByUserId_MovieId = async function (uid, movieId) {
+    return await db.query('select * from colmovie where user_id = ? and movie_url=? limit 1', [uid, movieId]);
 }
-
 
 /**
  * 直接物理删除用户收藏的电影信息
  * @param uid
- * @param callback
  */
-MovieCol.deleteColMovie = function (uid, url, callback) {
-    db.query('delete from colmovie where user_id = ? and movie_url = ?', [uid, '' + url + ''],
-        function (err, result) {
-            if (err) {
-                return callback(err, null);
-            }
-            callback(null, result);
-        })
+MovieCol.deleteColMovie = async function (uid, url) {
+    return await db.query('delete from colmovie where user_id = ? and movie_url = ?', [uid, '' + url + '']);
 }
-
 
 /**
  * 获取用户的收藏电影的详细信息
  * @param uid
- * @param callback
  */
-MovieCol.getColMovieDetails = function(uid, callback){
-    db.query('select movies.title as title, movies.info as info, colmovie.addtime as addtime, movies.url as url from movies , colmovie WHERE movies.url = colmovie.movie_url and colmovie.user_id = ?', [
-        uid
-    ], function (err, result) {
-        if (err) {
-            return callback(err, null);
-        }
-        callback(null, result);
-    })
+MovieCol.getColMovieDetails = async function (uid) {
+    return await db.query('select movies.title as title, movies.info as info, colmovie.addtime as addtime, movies.url as url from movies , colmovie WHERE movies.url = colmovie.movie_url and colmovie.user_id = ?', [uid]);
 }
-
 
 module.exports = MovieCol;

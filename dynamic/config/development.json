@@ -4,7 +4,7 @@
         "pageSize": 5,
         "secretKey": "video-2018",
         "movieurl": "http: //vip.iqiyi.com/hot.html?cid=1",
-        "movieParseUrl": "https: //cdn.yangju.vip/k/?url="
+        "movieParseUrl": "https://cdn.yangju.vip/k/?url="
     },
     "db": {
         "host": "localhost",

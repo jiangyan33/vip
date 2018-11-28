@@ -27,27 +27,36 @@ exports.showIndex = async function (req, res) {
             // 1. 获取电视列表所有信息
             let TVResult = await TV.getTVSByCurrentPage(params);
             //修改访问的url
-            TVResult.map((item) => item.url.substring(item.url.toString().lastIndexOf('/') + 1));
+            TVResult.map((item) => {
+                item.url = item.url.substring(item.url.toString().lastIndexOf('/') + 1);
+            });
             // 2. 获取电视列表的总数量信息
             let TVCount = await TV.getTVPageNums();
             let pageNum = Math.ceil(TVCount[0].pageNum / pageSize);
             return_data = {
                 tvs: TVResult,
-                tvPageNum: pageNum,
+                tvPageNum: pageNum
             };
             return res.json(return_data);
         } else {
             // 获取首页轮播图效果
             let previewResult = await Preview.getPreview();
-            previewResult.map((item) => item.playurl.substring(item.playurl.toString().lastIndexOf('/') + 1));
-
+            previewResult.map((item) => {
+                item.playurl = item.playurl.substring(item.playurl.toString().lastIndexOf('/') + 1);
+            });
             // 获取电影的数量信息
             let movieCount = await Movie.getMoviePageNums();
             let pageNum = Math.ceil(movieCount[0].pageNum / pageSize);
 
             // 展示首页的时候，开始去数据库中查询数据
             let movieResult = await Movie.getMoviesByCurrentPage(params);
-            movieResult.map((item) => item.url.substring(item.url.toString().lastIndexOf('/') + 1));
+            movieResult.map((item) => {
+                if (item.source === 1) {
+                    item.url = item.id;
+                } else {
+                    item.url = item.url.substring(item.url.toString().lastIndexOf('/') + 1);
+                }
+            });
             // 用户注册成功的话，就去直接跳转到首页信息(如果是默认请求首页的话)
             if (pageNow === 1) {
                 return res.render('index', {

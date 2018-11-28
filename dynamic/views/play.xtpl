@@ -182,7 +182,7 @@
                             }
                             $("#pageNow").html(o),
                                 $.ajax({
-                                    url: "/comment/" + o,
+                                    url: "/comment?movieId={{movie.id}}&&currentPage="+o,
                                     type: "GET",
                                     dataType: "json",
                                     data: "",
@@ -224,25 +224,25 @@
                     $("#collect-movie").on("click",
                         function (t) {
                             t.preventDefault();
-                            var e = window.location.href.toString(),
-                                o = e.substring(e.lastIndexOf("/") + 1);
+                            var e = window.location.href.toString();
+                               
                             "收藏电影" === $("#collect-movie").text().trim() ? $.ajax({
                                 url: "/play/colmovie/0",
                                 type: "POST",
                                 data: {
-                                    url: o
+                                    url: "{{movie.url}}"
                                 },
                                 success: function (t) {
                                     t && 1 === t.code && $("#collect-movie").html("取消收藏")
                                 }
-                            }) : "取消收藏" === $("#cancel-movie").text() && $.ajax({
+                            }) : "取消收藏" === $("#collect-movie").text() && $.ajax({
                                 url: "/play/colmovie/1",
                                 type: "POST",
                                 data: {
-                                    url: o
+                                    url: "{{movie.url}}"
                                 },
                                 success: function (t) {
-                                    t && 1 === t.code && $("#cancel-movie").html("收藏电影")
+                                    t && 1 === t.code && $("#collect-movie").html("收藏电影")
                                 }
                             })
                         }),
@@ -255,7 +255,7 @@
                                 url: "/play/colmovie/1",
                                 type: "POST",
                                 data: {
-                                    url: o
+                                    url: "{{movie.url}}"
                                 },
                                 success: function (t) {
                                     t && 1 === t.code && $("#cancel-movie").html("收藏电影")
@@ -264,7 +264,7 @@
                                 url: "/play/colmovie/0",
                                 type: "POST",
                                 data: {
-                                    url: o
+                                    url: "{{movie.url}}"
                                 },
                                 success: function (t) {
                                     t && 1 === t.code && $("#cancel-movie").html("取消收藏")

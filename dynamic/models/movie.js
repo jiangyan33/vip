@@ -17,33 +17,19 @@ function Movie(movie) {
     this.addtime = movie.addtime;
     this.type = movie.type;
     this.little_socre = movie.little_socre;
+    this.source=movie.source;
 }
 
 /**
  * 插入数据到数据库,先一次保存一条数据
  */
 Movie.prototype.save = async function () {
-    let params = [this.title, this.url, this.info, this.logo, this.score, this.playnum, this.commentnum, this.release_time, this.type, this.little_socre];
-    let result = await db.query(`insert into movies values(null, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?,?)`, params);
+    let params = [this.title, this.url, this.info, this.logo, this.score, this.playnum, this.commentnum, this.release_time, this.type, this.little_socre,this.source];
+    let result = await db.query(`insert into movies values(null, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?,?,?)`, params);
     // 如如完毕之后，开始执行数据去重操作,
     await db.query(`delete from movies where url  in (select url from (select url from movies group by url having count(url)>1) as tmp1) and id not in (select id from (select min(id) as id from movies group by url having count(url)>1) as temp2)`);
     return result;
 }
-
-
-/**
- * 获取所有的电影对象,这个不提供,返回数据量太大，用不到
- */
-// Movie.getAllMovies = function (callback) {
-//     db.query('select * from movies', [],
-//         function (err, result) {
-//             if (err) {
-//                 return callback(err, null);
-//             }
-
-//             callback(null, result);
-//         })
-// }
 
 
 /**
@@ -58,8 +44,15 @@ Movie.getMoviesByCurrentPage = async function (params) {
  * 根据URl地址获取电影的详细信息
  * @param url
  */
-Movie.getMovieByUrl = async function (url, callback) {
+Movie.getMovieByUrl = async function (url) {
     return await db.query('select * from movies where url = ? limit 1', [url]);
+}
+/**
+ * 根据ID地址获取电影的详细信息
+ * @param id
+ */
+Movie.getMovieById = async function (id) {
+    return await db.query('select * from movies where id = ? limit 1', [id]);
 }
 /**
  * 统计电影数量
@@ -79,7 +72,7 @@ Movie.getMovieByName = async function (name) {
 
 /**
  * 修改电影的播放数量信息
- * @param url
+ * @param id
  */
 Movie.updatePlayNumsById = async function (id) {
     return await db.query('update movies set playnum = playnum +1 where id = ?', [id]);
