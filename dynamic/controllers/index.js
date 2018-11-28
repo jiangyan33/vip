@@ -5,6 +5,7 @@ const Preview = require('../models/preview');
 const TV = require('../models/tv');
 const ResponseWrapper = require('../utils/response_wrapper');
 const logger = require('../utils/log').getLogger();
+const db = require('../models/db');
 
 /**
  * 显示首页信息
@@ -79,4 +80,9 @@ exports.showIndex = async function (req, res) {
         logger.error(error);
         return response_wrapper.error('HANDLE_ERROR');
     }
+}
+
+exports.test = async function (req, res) {
+    let result = await db.query('delete from movies where id in (1,2)');
+    return res.json(['ok']);
 }

@@ -10,8 +10,11 @@ const fs = require('fs');
 const path = require('path');
 const data = require('../data/index');
 const TV = require('../models/tv');
+const utils = require('../utils/utils');
 const Comment = require('../models/comment');
-
+const ResponseWrapper = require('../utils/response_wrapper');
+const logger = require('../utils/log').getLogger();
+const db = require('../models/db');
 
 /**
  * 添加电影的细节信息描述（未插入数据到数据库）
@@ -22,126 +25,15 @@ const Comment = require('../models/comment');
  * @param res
  * @param next
  */
-exports.showMovieAddDetails = function (req, res, next) {
-    let movieurl = req.app.locals.config.movieurl;
-    // console.log(movieurl, '本轮数据抓取开始了');
+exports.showMovieAddDetails = async function (req, res) {
+    let response_wrapper = new ResponseWrapper(res);
+    try {
+        let movieurl = req.app.locals.config.movieurl;
 
-    // 开始专区数据信息,现在主要不会使用前后端分离的实践
-    getMovieDetails(req, movieurl, function (err, result) {
-        if (err) {
-            return next(err);
-        }
-
-        // 开始返回结果信息（获取的是数组信息）
-        if (result) {
-            return res.json({
-                code: 1,
-                movies: result
-            });
-        }
-
-        // 获取数据失败
-        return res.json({
-            code: 0,
-            msg: 'faild'
-        });
-    });
-}
-
-
-/**
- * 将上面抓取的数据放入到数据库中
- * @param req
- * @param res
- * @param next
- */
-exports.addMovie = function (req, res, next) {
-    let checkNum = req.body.checkNum;
-    // console.log('开始进行数据入库了', checkNum, req.app.locals.config.movielist)
-    if (checkNum != -9999) {
-        // console.log('传参不一致，返回');
-        return res.json({
-            code: 0,
-            msg: '数据入库失败'
-        })
-    }
-
-
-    // 开始获取用户抓取的结果
-    let movieList = req.app.locals.config.movielist;
-    // console.log('读取本地抓取记录', movieList)
-    if (movieList) {
-        // console.log('数据去重成功……………………, 有效记录', movieList.length - movieList.length, '条', '去重记录', movieList.length + '条')
-        // 3. 开始把去重之后的数据插入到数据库
-        let successNum = 0;
-        let len = 0;
-        movieList.forEach(function (item) {
-            let total = item.score.replace(/\D/g, '');
-            // 获取数据信息
-            let url = item.url;
-            let title = item.title;
-            let logo = item.logo;
-            let info = item.info;
-            let score = total.substring(0, total.length - 1);
-            let addtime = moment().format('YYYY-MM-DD HH:mm:ss');
-            let playnum = 0;
-            let commentnum = 0;
-            let release_time = moment().format('YYYY-MM-DD HH:mm:ss');
-            let type = '电影';
-            let little_socre = total.substring(total.length - 1);
-
-            // 记录下当前的时间点
-            // let time = +new Date();
-            // saveDir = '/www/uploads/movie/' + time + '.jpg';
-
-            // 构造电影实例对象
-            let movie = new Movie({
-                title,
-                url,
-                info,
-                logo,
-                score,
-                playnum,
-                commentnum,
-                addtime,
-                release_time,
-                type,
-                little_socre
-            });
-            movie.save(function (err, result) {
-                if (err) {
-                    return next(err);
-                }
-                //执行一次sql
-                len++;
-                // 这个是最终去重之后的数据记录
-                if (len === movieList.length) {
-                    res.json({
-                        code: 0,
-                        msg: len
-                    })
-                }
-            });
-        })
-    }
-}
-
-
-/**
- * 获取电影详细信息
- * @param url
- * @param callback
- */
-function getMovieDetails(req, url, callback) {
-    // console.log('本轮抓取数据开始了-----------------------------------------------------')
-    let movieList = [];
-    request(url, function (err, res, body) {
-        if (err) {
-            return callback(err, null);
-        }
-
-        // 获取网站内容并转换
-        var $ = cheerio.load(body);
+        // 开始专区数据信息,现在主要不会使用前后端分离的实践
+        let requestAsync = utils.convert(request);
+        let body = await requestAsync(movieurl);
+        var $ = cheerio.load(body[0].body);
         // 拿到电影的列表DOM元素
         /** 排行榜的数据标签
          * <a class="site-piclist_pic_link" href="http://www.iqiyi.com/v_19rr7peols.html" title="蚁人2：黄蜂女现身" target="_blank" rseat="709181_热播榜二级页_电影3">
@@ -150,7 +42,7 @@ function getMovieDetails(req, url, callback) {
         <span class="dypd_piclist_nub dypd_piclist_nubHot hot-three">3</span>
     </p>
     <p class="play_coverWrap" data-videolist-elem="playbtn"><i class="site-icons icon-play5858"></i></p>
-</a>
+    </a>
          */
         let site_piclist = $('.site-piclist_pic_link');
         /**
@@ -161,12 +53,12 @@ function getMovieDetails(req, url, callback) {
         /**
          * <span class="score">
      <strong class="num">9</strong>.1
-   </span>
+    </span>
          */
         let score = $('.score');
         //let desc = $('.site-piclist_info_describe');
-        let len = site_piclist.length;
-
+        // let len = site_piclist.length;
+        let movieList = [];
         if (site_piclist && site_piclist.length > 0) {
             site_piclist.each(function (index) {
                 var pic_item = site_piclist[index];
@@ -189,31 +81,88 @@ function getMovieDetails(req, url, callback) {
                         info: $(site_piclist_info_describe[index]).text(),
                         score: $(score[index]).html().trim()
                     });
-
                 }
             })
         }
-
         // 在这里判断
         movieList.length = 50;
-        len = 50;
-        if (movieList.length === len) {
-            saveImages(movieList, function (err, movieList) {
-                if (err) {
-                    callback(err, null);
-                }
+        // len = 50;
+        // if (movieList.length === len) {
+        movieList = saveImages(movieList);
+        req.app.locals.config.movielist = movieList;
+        return res.json({
+            code: 1,
+            movies: movieList
+        });
+    } catch (error) {
+        //写错误日志
+        logger.error(error);
+        return response_wrapper.error('HANDLE_ERROR');
+    }
+}
 
-                // console.log('本轮抓取到数据共计' + len + '条---------------------------------------------')
-                // 把当前数据挂载起来
 
-                req.app.locals.config.movielist = movieList;
+/**
+ * 将上面抓取的数据放入到数据库中
+ * @param req
+ * @param res
+ * @param next
+ */
+exports.addMovie = async function (req, res) {
 
+    let response_wrapper = new ResponseWrapper(res);
+    try {
+        // let checkNum = req.body.checkNum;
+        // console.log('开始进行数据入库了', checkNum, req.app.locals.config.movielist)
+        // if (checkNum != -9999) {
+        //     // console.log('传参不一致，返回');
+        //     return res.json({
+        //         code: 0,
+        //         msg: '数据入库失败'
+        //     })
+        // }
+        // 开始获取用户抓取的结果
+        let movieList = req.app.locals.config.movielist;
+        // console.log('读取本地抓取记录', movieList)
+        if (movieList) {
+            // console.log('数据去重成功……………………, 有效记录', movieList.length - movieList.length, '条', '去重记录', movieList.length + '条')
+            // 3. 开始把去重之后的数据插入到数据库
 
-                callback(null, movieList);
+            movieList = movieList.map((item, index) => {
+                let total = item.score.replace(/\D/g, '');
+                let url = item.url;
+                let title = item.title;
+                let logo = item.logo;
+                let info = item.info;
+                let score = total.substring(0, total.length - 1);
+                // let addtime = moment().format('YYYY-MM-DD HH:mm:ss');
+                let playnum = 0;
+                let commentnum = 0;
+                // let release_time = now();
+                let type = '电影';
+                let little_score = total.substring(total.length - 1);
+                let movie = [null, title, url, info, logo, score, playnum, commentnum, new Date(), new Date(), type, little_score, 2];
+                return movie;
             })
-
+            let params = [];
+            for (let item of movieList) {
+                params = params.concat(item);
+            }
+            let picKey = ['id', 'title', 'url', 'info', 'logo', 'score', 'playnum', 'commentnum', 'release_time', 'addtime', 'type', 'little_score', 'source'];
+            let insertSql = `insert into movies(${picKey.join()}) values ${movieList.map(() => `(${picKey.map(() => '?').join()})`)}`;
+            let result = await db.query(insertSql, params);
+            //执行去重复sql语句，同时删除重复数据对应的图片
+            await delete_movie();
+            return res.json({
+                code: 0,
+                msg: result
+            })
         }
-    });
+    } catch (error) {
+        //写错误日志
+        logger.error(error);
+        return response_wrapper.error('HANDLE_ERROR');
+    }
 }
 
 
@@ -331,8 +280,8 @@ exports.doSearchMovie = function (req, res, next) {
  * 保存图片信息到本地
  * @param movieList
  */
-function saveImages(movieList, callback) {
-    let nums = movieList.length;
+function saveImages(movieList) {
+    // let nums = movieList.length;
     let tempArr = [];
     if (movieList && movieList.length > 0) {
         movieList.forEach(function (item) {
@@ -344,17 +293,17 @@ function saveImages(movieList, callback) {
                     url = tempArr[0];
                 }
                 let newPath = '../www/uploads/movie/' + (+new Date()) + url + '.jpg';
-
                 // 开始下载图片数据信息
                 request(item.logo).pipe(fs.createWriteStream(path.join(__dirname, newPath)));
                 item.logo = newPath.substr(2);
-                nums--;
-                if (nums === 0) {
-                    callback(null, movieList);
-                }
+                // nums--;
+                // if (nums === 0) {
+                //     callback(null);
+                // }
             }
         })
     }
+    return movieList;
 }
 
 
@@ -483,4 +432,25 @@ exports.doSearchMovieOnline = function (req, res, next) {
             });
         }
     })
+}
+
+/**
+ * 数据库表数据去重复
+ */
+async function delete_movie() {
+    let deleteSql = `select id,logo from movies   
+    where url  in (select  url  from movies  group  by  url   having  count(url) > 1)  
+    and  id   not in (select max(id) from  movies  group by url  having count(url )>1)`;
+    let delete_result = await db.query(deleteSql);
+    if (delete_result.length !== 0) {
+        //执行删除重复数据操作
+        let ids = delete_result.map((it) => { return it.id });
+        let logos = delete_result.map((it) => { return it.logo });
+        await db.query(`delete from movies where id in ( ${ids.map(() => '?').join()} )`, ids);
+        //删除图片信息操作
+        let filepath = path.join(__dirname, '../');
+        for (let logo of logos) {
+            fs.unlinkSync(filepath + logo);
+        }
+    }
 }

@@ -14,7 +14,7 @@ const indexController = require('../controllers/index');
 const userController = require('../controllers/user');
 const playController = require('../controllers/play');
 const commentController = require('../controllers/comment');
-// const movieController = require('../controllers/movie');
+const movieController = require('../controllers/movie');
 const colmovieController = require('../controllers/moviecol');
 // const adminController = require('../controllers/admin');
 // 前台路由控制中心-------------------------------------------------------------------------------------------------------------------
@@ -36,6 +36,7 @@ router.post('/user/upload', [upload.single('pic'), userController.uploadImage]);
 router.get('/captcha', userController.getCaptcha);                // 获取验证码
 router.post('/userlog', userController.showUserlogs);                   // 用户中心显示日志
 router.get('/comment/:currentPage', commentController.showUserComment);                 // 用户中心显示评论
+router.post('/colmovie/:currentPage', colmovieController.showUserColMovie);                 //显示用户收藏的电影
 
 
 //播放模块
@@ -47,7 +48,7 @@ router.get('/comment', commentController.showMovieComment)     //播放页面的
 router.post('/play/colmovie/:tag', colmovieController.doColMovie);
 
 
-router.post('/colmovie/:currentPage', colmovieController.showUserColMovie);                 // 用户中心显示评论
+
 
 // router.get('/search', movieController.showSearchMovie);
 // //在线搜索视频
@@ -55,10 +56,17 @@ router.post('/colmovie/:currentPage', colmovieController.showUserColMovie);     
 // router.post('/search', movieController.doSearchMovie);
 // router.get('/addTV', movieController.doGetTVs);
 // //从网上抓取数据并返回
-// router.get('/showMovieAddDetails', movieController.showMovieAddDetails);
+router.get('/showMovieAddDetails', movieController.showMovieAddDetails);
 // //将抓取的数据插入到数据库
-// router.post('/addMovie', movieController.addMovie);
+router.post('/addMovie', movieController.addMovie);
 // //测试xtpl使用数据
+
+
+//测试sql语句使用
+router.get('/test', indexController.test);
+
+
+
 
 // //上传视频
 // router.get('/showAdmin', adminController.showAdmin);

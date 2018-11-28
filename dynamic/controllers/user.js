@@ -6,7 +6,6 @@ const User = require('../models/user');
 const utility = require('utility');   // 需要的MD5加密工具包
 const path = require('path');
 const fs = require('fs');
-const gm = require('gm');
 const utils = require('../utils/utils');
 const Userlog = require('../models/userlog');
 const moment = require('moment');

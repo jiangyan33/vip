@@ -12,7 +12,7 @@ const pool = createPool(config);
  * @param params
  * @param callback
  */
-exports.query = async function (sql, params) {
+exports.query = async function (sql,params) {
 
     // 传参校验
     if (params) {
