@@ -17,14 +17,14 @@ function Movie(movie) {
     this.addtime = movie.addtime;
     this.type = movie.type;
     this.little_socre = movie.little_socre;
-    this.source=movie.source;
+    this.source = movie.source;
 }
 
 /**
  * 插入数据到数据库,先一次保存一条数据
  */
 Movie.prototype.save = async function () {
-    let params = [this.title, this.url, this.info, this.logo, this.score, this.playnum, this.commentnum, this.release_time, this.type, this.little_socre,this.source];
+    let params = [this.title, this.url, this.info, this.logo, this.score, this.playnum, this.commentnum, this.release_time, this.type, this.little_socre, this.source];
     let result = await db.query(`insert into movies values(null, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?,?,?)`, params);
     // 如如完毕之后，开始执行数据去重操作,
     await db.query(`delete from movies where url  in (select url from (select url from movies group by url having count(url)>1) as tmp1) and id not in (select id from (select min(id) as id from movies group by url having count(url)>1) as temp2)`);
@@ -66,7 +66,15 @@ Movie.getMoviePageNums = async function () {
  * @param name
  */
 Movie.getMovieByName = async function (name) {
-    return await db.query('select * from movies where title like ?', ['%' + name + '%']);
+    return await db.query('select * from movies where title like ? ', ['%' + name + '%']);
+}
+
+/**
+ * 根据电影标题模糊查询数量
+ * @param name
+ */
+Movie.getMovieCountByName = async function (name) {
+    return await db.query('select count(*) from movies where title like ?', ['%' + name + '%']);
 }
 
 

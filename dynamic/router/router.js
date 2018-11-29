@@ -53,13 +53,16 @@ router.post('/play/colmovie/:tag', colmovieController.doColMovie);
 // router.get('/search', movieController.showSearchMovie);
 // //在线搜索视频
 // router.get('/search/:content', movieController.doSearchMovieOnline);
-// router.post('/search', movieController.doSearchMovie);
+router.get('/search', movieController.doSearchMovie);
 // router.get('/addTV', movieController.doGetTVs);
-// //从网上抓取数据并返回
+
+
+
+//抓取数据模块
 router.get('/showMovieAddDetails', movieController.showMovieAddDetails);
-// //将抓取的数据插入到数据库
-router.post('/addMovie', movieController.addMovie);
+router.post('/addMovie', movieController.addMovie);     //将抓取的数据插入到数据库
 // //测试xtpl使用数据
+//站内搜索
 
 
 //测试sql语句使用

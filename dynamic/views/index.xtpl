@@ -82,7 +82,8 @@ function toggleMivieButton() {
                 type: "post",
                 dataType: "json",
                 data: {
-                    type: "movie"
+                    type: "movie",
+                    movie_name:{{movie_name}}
                 },
                 success: function(s) {
                     if (s && 1 === s.code) {

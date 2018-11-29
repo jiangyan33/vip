@@ -3,7 +3,7 @@
         <div class="site-nav-logo"><a href="/" class="logo"><img src="/www/images/logo-e5eaf9963c.png" alt="">VIP影院</a><br><a
                 style="color:red;font-weight:700;font-family:'Microsoft YaHei'" href="/" class="box">看VIP视频，就来找我</a></div>
         <div class="site-nav-search">
-            <form action="/search" method="POST"><input type="text" placeholder="请输入电影名称或URL地址" name="moviename">
+            <form action="/search" method="GET"><input type="text" placeholder="请输入电影名称或URL地址" name="moviename">
                 <button type="submit">搜索</button></form>
         </div>
         <div class="site-nav-r">

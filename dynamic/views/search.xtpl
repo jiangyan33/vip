@@ -6,7 +6,8 @@
     <div class="search-content w">{{#if (movies.length === 3)}}<div class="search-con-l">
             <ul>
                 <li>
-                    <div class="search-content-left" style="background-color:#f30"><a href="/play/{{movies[0].url}}"><img src="{{movies[0].img}}"></a></div>
+                    <div class="search-content-left" style="background-color:#f30"><a href="/play/{{movies[0].url}}"><img
+                                src="{{movies[0].logo}}"></a></div>
                     <div class="search-content-right">
                         <div class="search-content-title"><a style="color:#f30" href="/play/{{movies[0].url}}">{{movies[0].title}}</a>
                             <span>2018</span></div>
@@ -17,7 +18,8 @@
             </ul>
             <ul>
                 <li>
-                    <div class="search-content-left" style="background-color:#fe9901"><a href="/play/{{movies[1].url}}"><img src="{{movies[1].img}}"></a></div>
+                    <div class="search-content-left" style="background-color:#fe9901"><a href="/play/{{movies[1].url}}"><img
+                                src="{{movies[1].logo}}"></a></div>
                     <div class="search-content-right">
                         <div class="search-content-title"><a style="color:#fe9901" href="/play/{{movies[1].url}}">{{movies[1].title}}</a>
                             <span>2018</span></div>
@@ -28,7 +30,8 @@
             </ul>
             <ul>
                 <li>
-                    <div class="search-content-left" style="background-color:#fc0"><a href="/play/{{movies[2].url}}"><img src="{{movies[2].img}}"></a></div>
+                    <div class="search-content-left" style="background-color:#fc0"><a href="/play/{{movies[2].url}}"><img
+                                src="{{movies[2].logo}}"></a></div>
                     <div class="search-content-right">
                         <div class="search-content-title"><a style="color:#fc0" href="/play/{{movies[2].url}}">{{movies[2].title}}</a>
                             <span>2018</span></div>
@@ -69,4 +72,23 @@
 <script src="/www/js/movielist/app.js"></script>
 <script src="/www/js/movielist/in_theaters/module.js"></script>
 <script src="/www/js/movielist/components/http-service.js"></script>
-<script>window.onload = function () { $("#intheater").on("click", function () { $("#intheater").css("color", "red").css("font-weight", "bold"), $("#coming").css("color", "black"), $("#top250").css("color", "black") }), $("#coming").on("click", function () { $("#intheater").css("color", "black"), $("#coming").css("color", "red").css("font-weight", "bold"), $("#top250").css("color", "black") }), $("#top250").on("click", function () { $("#intheater").css("color", "black"), $("#coming").css("color", "black"), $("#top250").css("color", "red").css("font-weight", "bold") }) }</script>{{/block}}
+<script>window.onload = function () {
+        $("#intheater").on("click",
+            function () {
+                $("#intheater").css("color", "red").css("font-weight", "bold"),
+                    $("#coming").css("color", "black"),
+                    $("#top250").css("color", "black")
+            }),
+            $("#coming").on("click",
+                function () {
+                    $("#intheater").css("color", "black"),
+                        $("#coming").css("color", "red").css("font-weight", "bold"),
+                        $("#top250").css("color", "black")
+                }),
+            $("#top250").on("click",
+                function () {
+                    $("#intheater").css("color", "black"),
+                        $("#coming").css("color", "black"),
+                        $("#top250").css("color", "red").css("font-weight", "bold")
+                })
+    }</script>{{/block}}

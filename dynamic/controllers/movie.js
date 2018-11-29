@@ -23,7 +23,6 @@ const db = require('../models/db');
  * 
  * @param req
  * @param res
- * @param next
  */
 exports.showMovieAddDetails = async function (req, res) {
     let response_wrapper = new ResponseWrapper(res);
@@ -106,7 +105,6 @@ exports.showMovieAddDetails = async function (req, res) {
  * 将上面抓取的数据放入到数据库中
  * @param req
  * @param res
- * @param next
  */
 exports.addMovie = async function (req, res) {
 
@@ -195,84 +193,91 @@ exports.showSearchMovie = function (req, res, next) {
  * @param res
  * @param next
  */
-exports.doSearchMovie = function (req, res, next) {
-    // 换一种思路来解析数据， 开始从网上抓取数据信息
-    let searchMoviename = req.body.moviename;
+exports.doSearchMovie = async function (req, res) {
+    let response_wrapper = new ResponseWrapper(res);
+    try {
+        // 换一种思路来解析数据， 开始从网上抓取数据信息
+        let searchMoviename = req.query.moviename;
+        let pageSize = req.app.locals.config.pageSize;
+        let currentPage = req.query.currentPage || 1;
+        // 这里需要判断一下，如果用户输入的是url地址的话,只有播放的功能
+        if (searchMoviename.startsWith('http')) {
+            //searchMoviename = searchMoviename.substring(searchMoviename.lastIndexOf('/') + 1);
+            searchMoviename = req.app.locals.config.movieParseUrl + searchMoviename;
 
-    // 这里需要判断一下，如果用户输入的是url地址的话
-    if (searchMoviename.startsWith('http')) {
-        //searchMoviename = searchMoviename.substring(searchMoviename.lastIndexOf('/') + 1);
-        searchMoviename = 'http://jx.598110.com/index.php?url=' + searchMoviename;
+            // 开始获取用户评论的数据信息
+            // 获取评论的详细信息
+            // 就直接解析当前地址， 然后播放视频
+            return res.render('play', {
+                playUrl: searchMoviename,
+                comments: [],
+                pageNum: 1,
+            });
 
-        // 开始获取用户评论的数据信息
-        let params = {
-            start: 0,
-            pageSize: 5
         }
-        // 获取评论的详细信息
-        Comment.getCommentByCurrentPage(params, function (err, comments) {
-            if (err) {
-                return next(err);
+        //从站内获取数据
+        //获取数据
+        let result = await Movie.getMovieByName(searchMoviename);
+        result.map((item) => {
+            if (item.source === 1) {
+                item.url = item.id;
+            } else {
+                item.url = item.url.substring(item.url.toString().lastIndexOf('/') + 1);
             }
-
-            // 获取评论数量信息
-            Comment.getCommentNums(function (err, pageInfo) {
-                if (err) {
-                    return next(err);
-                }
-                let pageNum = pageInfo.pageNums;
-                // 就直接解析当前地址， 然后播放视频
-                return res.render('play', {
-                    playUrl: searchMoviename,
-                    comments: comments,
-                    pageNum: Math.ceil(pageNum / 5),
-                });
-            })
         })
-        return;
+        if (result.length > 3) {
+            result.length = 3;
+        }
+        return res.render('search', {
+            movies: result
+        });
+    } catch (error) {
+        //写错误日志
+        logger.error(error);
+        return response_wrapper.error('HANDLE_ERROR');
     }
 
-    // 直接从爱奇艺网站抓取数据
-    data.searchMovie(searchMoviename, function (err, movies) {
-        if (err) {
-            return next(err);
-        }
-        // 如果没有找到的话就去数据库中找一下
-        if (movies.length === 0) {
-            Movie.getMovieByName(searchMoviename, function (err, result) {
-                if (err) {
-                    return next(err);
-                }
-                if (result.length > 3) {
-                    result = [result[0], result[1], result[2]];
-                }
-                result.forEach(function (element) {
-                    let url = element.url;
-                    element.url = url.substring(url.lastIndexOf('/') + 1)
-                    element.addtime = moment(element.addtime).format('YYYY-MM-DD');
-                    if (element.info.toString().length > 20) {
-                        element.info = element.info.toString().substring(0, 30);
-                    }
-                })
-                return res.render('search', {
-                    movies: result
-                });
-            })
-        } else {
-            movies.forEach(function (element) {
-                let url = element.url;
-                element.url = url.substring(url.lastIndexOf('/') + 1)
-                element.addtime = moment().format('YYYY-MM-DD');
-                if (element.info.toString().length > 20) {
-                    element.info = element.info.toString().substring(0, 30);
-                }
-            })
-            // 返回抓取的所有信息
-            return res.render('search', {
-                movies: movies
-            });
-        }
-    })
+    // // 直接从爱奇艺网站抓取数据
+    // data.searchMovie(searchMoviename, function (err, movies) {
+    //     if (err) {
+    //         return next(err);
+    //     }
+    //     // 如果没有找到的话就去数据库中找一下
+    //     if (movies.length === 0) {
+    //         Movie.getMovieByName(searchMoviename, function (err, result) {
+    //             if (err) {
+    //                 return next(err);
+    //             }
+    //             if (result.length > 3) {
+    //                 result = [result[0], result[1], result[2]];
+    //             }
+    //             result.forEach(function (element) {
+    //                 let url = element.url;
+    //                 element.url = url.substring(url.lastIndexOf('/') + 1)
+    //                 element.addtime = moment(element.addtime).format('YYYY-MM-DD');
+    //                 if (element.info.toString().length > 20) {
+    //                     element.info = element.info.toString().substring(0, 30);
+    //                 }
+    //             })
+    //             return res.render('search', {
+    //                 movies: result
+    //             });
+    //         })
+    //     } else {
+    //         movies.forEach(function (element) {
+    //             let url = element.url;
+    //             element.url = url.substring(url.lastIndexOf('/') + 1)
+    //             element.addtime = moment().format('YYYY-MM-DD');
+    //             if (element.info.toString().length > 20) {
+    //                 element.info = element.info.toString().substring(0, 30);
+    //             }
+    //         })
+    //         // 返回抓取的所有信息
+    //         return res.render('search', {
+    //             movies: movies
+    //         });
+    //     }
+    // })
 }
 
 
@@ -450,7 +455,12 @@ async function delete_movie() {
         //删除图片信息操作
         let filepath = path.join(__dirname, '../');
         for (let logo of logos) {
-            fs.unlinkSync(filepath + logo);
+            try {
+                //如果找不到图片文件，不进行处理
+                fs.unlinkSync(filepath + logo);
+            } catch (error) {
+                console.log(error);
+            }
         }
     }
 }
