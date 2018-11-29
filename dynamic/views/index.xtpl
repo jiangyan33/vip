@@ -83,7 +83,6 @@ function toggleMivieButton() {
                 dataType: "json",
                 data: {
                     type: "movie",
-                    movie_name:{{movie_name}}
                 },
                 success: function(s) {
                     if (s && 1 === s.code) {
@@ -281,7 +280,7 @@ imgShow.prototype = {
     }
 },
 window.onload = function() {
-    var s = ["/www/images/big0-ac1f59baaa.jpg", "/www/images/big1-32bb887f2a.jpg", "/www/images/big2-3db3ff8a57.jpg", "/www/images/big3-b966ef5b19.jpg", "/www/images/big4-8b61392485.jpg", "/www/images/big5-d969b56f32.jpg", "/www/images/big6-e78496e82e.jpg", "/www/images/big7-022d4be85e.jpg"];
+    var s = ["/www/images/big0.jpg", "/www/images/big1.jpg", "/www/images/big2.jpg", "/www/images/big3.jpg", "/www/images/big4.jpg", "/www/images/big5.jpg", "/www/images/big6.jpg", "/www/images/big7.jpg"];
     new imgShow(s).start(s),
     toggleMivieButton(),
     topPlay(),

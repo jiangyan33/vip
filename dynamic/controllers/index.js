@@ -83,6 +83,6 @@ exports.showIndex = async function (req, res) {
 }
 
 exports.test = async function (req, res) {
-    let result = await db.query('delete from movies where id in (1,2)');
+    // let result = await db.query('delete from movies where id in (1,2)');
     return res.json(['ok']);
 }

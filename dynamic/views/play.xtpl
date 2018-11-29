@@ -3,7 +3,8 @@
 <div class="play clearfix">
     <div class="w">
         <div></div>
-        <div class="play-video"><iframe id="video_iframe" frameborder="no" src="{{playUrl}}"></iframe>
+        <div class="play-video"><iframe id="video_iframe" frameborder="no" src="{{playUrl}}">
+        </iframe>
             <div class="video-top" id="video-top"></div>
         </div>
         <div class="play-intro">

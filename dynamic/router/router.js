@@ -16,7 +16,7 @@ const playController = require('../controllers/play');
 const commentController = require('../controllers/comment');
 const movieController = require('../controllers/movie');
 const colmovieController = require('../controllers/moviecol');
-// const adminController = require('../controllers/admin');
+const adminController = require('../controllers/admin');
 // 前台路由控制中心-------------------------------------------------------------------------------------------------------------------
 
 //网站首页
@@ -32,7 +32,7 @@ router.post('/login', userController.doLogin);                          // 用�
 router.get('/logout', userController.doLogout);                         // 用户退出
 router.get('/user', [checkNotLogin, userController.showUser]);                           // 显示用户中心
 router.post('/user', [checkNotLogin, userController.doUser]);                            // 用户修改信息之后提交数据
-router.post('/user/upload', [upload.single('pic'), userController.uploadImage]);  // 图片上传
+// router.post('/user/upload', [upload.single('pic'), userController.uploadImage]);  // 图片上传
 router.get('/captcha', userController.getCaptcha);                // 获取验证码
 router.post('/userlog', userController.showUserlogs);                   // 用户中心显示日志
 router.get('/comment/:currentPage', commentController.showUserComment);                 // 用户中心显示评论
@@ -53,14 +53,14 @@ router.post('/play/colmovie/:tag', colmovieController.doColMovie);
 // router.get('/search', movieController.showSearchMovie);
 // //在线搜索视频
 // router.get('/search/:content', movieController.doSearchMovieOnline);
-router.get('/search', movieController.doSearchMovie);
-// router.get('/addTV', movieController.doGetTVs);
+
 
 
 
 //抓取数据模块
 router.get('/showMovieAddDetails', movieController.showMovieAddDetails);
 router.post('/addMovie', movieController.addMovie);     //将抓取的数据插入到数据库
+router.get('/search', movieController.doSearchMovie);       //搜索功能
 // //测试xtpl使用数据
 //站内搜索
 
@@ -71,60 +71,10 @@ router.get('/test', indexController.test);
 
 
 
-// //上传视频
-// router.get('/showAdmin', adminController.showAdmin);
-// //upload.fields([{ video: 'avatar', maxCount: 1 }, { name: 'logo', maxCount: 1 }])
-// let arr = [
-//     { name: 'video', maxCount: 1 },
-//     { name: 'logo', maxCount: 1 }
-// ];
-// router.post('/video/upload', multer().fields(arr), adminController.upload);
-
-
-
-// router.get('/test', function (req, res) {
-//     //操了，数据都搞没了
-//     let sql = "select id,score from movies";
-//     db.query(sql, (err, result) => {
-//         result.forEach(element => {
-//             let total = element['score'].replace(/\D/g, '');
-//             element['score'] = total.substring(0, total.length - 1);
-//             element['little_score'] = total.substring(total.length - 1);
-//             db.query('update movies set score=?,little_score=? where id=?', [element['score'], element['little_score'], element['id']], (err, result) => {
-//                 console.log('11');
-//             });
-//         });
-
-//     })
-
-//     let message = {
-//         students: [
-//             { name: '小明', age: 10 },
-//             { name: '小红', age: 11 }, { name: '小均', age: 20 }, { name: '小丽', age: 30 }
-//         ],
-//         user: {
-//             username: '石江山',
-//             password: 123
-//         },
-//         success: true,
-//         number: 1000,
-//         socre: '<a>百度一下</a>'
-//     };
-//     return res.render('demo', message);
-// })
-
-
-// if (config.isDebug) {
-//     //console.log('is debug')
-//     app.use(function (err, req, res, next) {
-//         //console.log(err);
-//     });
-// } else {
-//     app.use(function (err, req, res, next) {
-
-//     })
-// }
-
+// //上传视频模块
+router.get('/showAddMovie', movieController.showMovieAdd);
+let fields = [{ name: 'logo', maxCount: 1 }, { name: 'video', maxCount: 1 }];
+router.post('/video/upload', upload.fields(fields), adminController.upload);
 
 // 路由跳转检查中心-------------------------------------------------------------------------------------------------------------------
 function checkLogin(req, res, next) {

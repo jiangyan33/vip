@@ -3,15 +3,14 @@
     <div class="register-form">
         <div class="form-title">视频上传</div>
         <div class="form-content">
-            <form action="/video/upload" method="post" class="form-group"><label for="uname" id="">视频名称</label>
-                <input type="text" placeholder="" name="name" id="uname" autofocus value="{{uname}}"> <label for="email"
-                    id="emaillb">视频简介</label> <input type="text" placeholder="" name="email" id="email"> <label for="phone"
-                    id="phonelb">图片</label> <input type="file" name="logo" id="phone"> <label for="pwd1"
-                    id="pwd1lb">视频</label> <input type="file"  name="video" id="pwd1"> <label for="pwd2"
-                    id="pwd2lb"></label> <input type="password" placeholder="确认密码" name="pwd2" id="pwd2"> 
-                <button type="submit">上传</button>
+            <form action="/video/upload" method="post" enctype=”multipart/form-data” class="form-group"><label for="uname" id="">视频名称</label>
+                <input type="text" placeholder="" name="name" id="" autofocus value="{{uname}}"> <label for=""
+                    id="">视频简介</label> <input type="text" placeholder="" name="info" id=""> <label for=""
+                    id="">图片</label> <input type="file" name="logo" id=""> <label for=""
+                    id="">视频</label> <input type="file"  name="video" id=""> 
+                <input type="submit" value="上传">
             </form>
         </div>
     </div>
 </div>{{/block}} {{#block ("foot")}}
-<script>window.onload = function () { function n(l) { var t = $("#uname").val(), a = $("#email").val(), n = $("#phone").val(), e = $("#pwd1").val(), o = $("#pwd2").val(), r = $("#captcha").val(); return null == t || void 0 === t || "" === t ? ($("#unamelb").html('<span style="color: red">用户名不能为空</span>'), !1) : $.isString(t) && (t.length < 4 || 12 < t.length) ? ($("#unamelb").html('<span style="color: red">用户名为4到12位有效字符</span>'), !1) : ($("#unamelb").html("用户名"), null == a || void 0 === a || "" === a ? ($("#emaillb").html('<span style="color: red">邮箱不能为空</span>'), !1) : $.isString(a) && !a.match(/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/g) ? ($("#emaillb").html('<span style="color: red">邮箱格式错误</span>'), !1) : ($("#emaillb").html("邮箱"), null == n || void 0 === n || "" === n ? ($("#phonelb").html('<span style="color: red">手机不能为空</span>'), !1) : $.isString(n) && !n.match(/(^1[3|4|5|7|8]\d{9}$)|(^09\d{8}$)/) ? ($("#phonelb").html('<span style="color: red">手机格式有误</span>'), !1) : ($("#phonelb").html("手机"), null == e || void 0 === e || "" === e ? ($("#pwd1lb").html('<span style="color: red">密码不能为空</span>'), !1) : $.isString(e) && e.length < 5 ? ($("#pwd1lb").html('<span style="color: red">密码强度不能少于5个字符</span>'), !1) : ($("#pwd1lb").html("密码"), null == o || void 0 === o || "" === o ? ($("#pwd2lb").html('<span style="color: red">确认密码不能为空</span>'), !1) : $.isString(o) && o !== e ? ($("#pwd2lb").html('<span style="color: red">确认密码不一致</span>'), !1) : ($("#pwd2lb").html("确认密码"), null == r || void 0 === r || "" === r ? ($("#captchalb").html('<span style="color: red">验证码不能为空</span>'), !1) : ($("#captchalb").html("验证码"), !0)))))) } $("input").on("blur", function () { if (!n()) return !1 }), $("#register-form").on("submit", function (l) { if ($.preventDefault(l), !n()) return !1; var t = $(this).attr("action"), a = $(this).attr("method"); $.ajax({ url: t, type: a, data: $.serialize("register-form"), dataType: "json", success: function (l) { l && 1 === l.code ? (window.location.href = "/", alert("恭喜你注册成功！")) : l && 1001 === l.code ? ($("#captchalb").html('<span style="color: red">验证码输入错误</span>'), $("#captcha-img").get(0).src = "/captcha?" + new Date, $("#captcha").val("")) : l && 1002 === l.code ? ($("#unamelb").html('<span style="color: red">用户名已存在</span>'), $("#uname").get(0).focus()) : alert(JSON.stringify(l)) }, error: function (l) { console.log(l) } }) }) }</script>{{/block}}
+{{/block}}

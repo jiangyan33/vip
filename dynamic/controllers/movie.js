@@ -170,9 +170,9 @@ exports.addMovie = async function (req, res) {
  * @param res
  * @param next
  */
-exports.showMovieAdd = function (req, res, next) {
+exports.showMovieAdd = function (req, res) {
     // 专门用于添加电影
-    res.render('admin/movieadd');
+    res.render('admin');
 }
 
 
@@ -236,48 +236,6 @@ exports.doSearchMovie = async function (req, res) {
         logger.error(error);
         return response_wrapper.error('HANDLE_ERROR');
     }
-
-    // // 直接从爱奇艺网站抓取数据
-    // data.searchMovie(searchMoviename, function (err, movies) {
-    //     if (err) {
-    //         return next(err);
-    //     }
-    //     // 如果没有找到的话就去数据库中找一下
-    //     if (movies.length === 0) {
-    //         Movie.getMovieByName(searchMoviename, function (err, result) {
-    //             if (err) {
-    //                 return next(err);
-    //             }
-    //             if (result.length > 3) {
-    //                 result = [result[0], result[1], result[2]];
-    //             }
-    //             result.forEach(function (element) {
-    //                 let url = element.url;
-    //                 element.url = url.substring(url.lastIndexOf('/') + 1)
-    //                 element.addtime = moment(element.addtime).format('YYYY-MM-DD');
-    //                 if (element.info.toString().length > 20) {
-    //                     element.info = element.info.toString().substring(0, 30);
-    //                 }
-    //             })
-    //             return res.render('search', {
-    //                 movies: result
-    //             });
-    //         })
-    //     } else {
-    //         movies.forEach(function (element) {
-    //             let url = element.url;
-    //             element.url = url.substring(url.lastIndexOf('/') + 1)
-    //             element.addtime = moment().format('YYYY-MM-DD');
-    //             if (element.info.toString().length > 20) {
-    //                 element.info = element.info.toString().substring(0, 30);
-    //             }
-    //         })
-    //         // 返回抓取的所有信息
-    //         return res.render('search', {
-    //             movies: movies
-    //         });
-    //     }
-    // })
 }
 
 
@@ -297,7 +255,7 @@ function saveImages(movieList) {
                 if (tempArr.length === 2) {
                     url = tempArr[0];
                 }
-                let newPath = '../www/uploads/movie/' + (+new Date()) + url + '.jpg';
+                let newPath = '../www/uploads/image/' + (+new Date()) + url + '.jpg';
                 // 开始下载图片数据信息
                 request(item.logo).pipe(fs.createWriteStream(path.join(__dirname, newPath)));
                 item.logo = newPath.substr(2);
